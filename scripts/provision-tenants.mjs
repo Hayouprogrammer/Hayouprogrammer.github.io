@@ -78,11 +78,12 @@ async function login(viewport) {
 
 async function readTenantForm(page) {
   return page.evaluate(() => {
-    const badge = document.querySelector(".o_field_widget[name='state'] .badge, .o_field_widget[name='state'] .o_badge");
-    let stateText = badge ? (badge.textContent || "").trim() : "";
+    let stateText = "";
+    const badge = document.querySelector(".o_field_widget[name='state'] .badge, .o_field_widget[name='state'] .o_badge, .o_field_widget[name='state'] span.text-bg-\\!, .o_field_widget[name='state'] span");
+    if (badge && badge.children.length === 0) stateText = (badge.textContent || "").trim();
     if (!stateText) {
-      const sel = document.querySelector("select[name='state'], .o_field_widget[name='state']");
-      if (sel) stateText = (sel.value || sel.textContent || "").trim();
+      const sel = document.querySelector("select[name='state']");
+      if (sel) stateText = (sel.value || "").trim();
     }
     const notes = Array.from(document.querySelectorAll(".o-mail-Message-body, .o_mail_thread_message_content"))
       .map((e) => (e.innerText || "").trim()).filter(Boolean);
@@ -126,7 +127,13 @@ for (const target of targets) {
   log(`  visible provision/retry buttons=${visible}`);
   if (visible) {
     await btn.click({ timeout: 30000 });
-    await settle(page, 3000);
+    await settle(page, 1500);
+    // Odoo's button-level confirm= renders an in-app modal, not a native dialog.
+    const confirmBtn = page.locator(".modal.in .btn-primary, .modal.in .modal-footer button.btn-primary, .o_dialog .btn-primary").first();
+    if (await confirmBtn.count().then((c) => c > 0)) {
+      await confirmBtn.click().catch(() => {});
+      await settle(page, 2500);
+    }
     const toast = (await page.locator(".o_notification, .o_notification_manager .alert").allInnerTexts().catch(() => []))[0] || "";
     log(`  toast: ${toast.replace(/\s+/g, " ").slice(0, 200)}`);
     await dismissOverlays(page);

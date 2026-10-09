@@ -40,6 +40,49 @@ function resolveChromium() {
 
 mkdirSync(REVIEW, { recursive: true });
 
+/**
+ * Wait for every image on the page to finish decoding. Full-page captures
+ * expand the viewport, which triggers lazy loads mid-flight; without this the
+ * captures show empty plates and the audit lies about the build.
+ *
+ * Bounded: an image that already errored before the listener attached would
+ * otherwise never resolve, and the whole audit would hang.
+ */
+async function settleImages(page, budgetMs = 12000) {
+  // Walk the page first. A `loading="lazy"` image below the fold never starts
+  // fetching until the browser decides it is near the viewport, and a
+  // beyond-viewport capture does not scroll — so without this pass the plates
+  // come back blank and the audit lies about the build.
+  await page.evaluate(async () => {
+    const step = Math.max(200, window.innerHeight * 0.8);
+    for (let y = 0; y < document.body.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+    window.scrollTo(0, 0);
+  });
+
+  await page.evaluate(async (budget) => {
+    const deadline = Date.now() + budget;
+    const imgs = Array.from(document.images);
+    await Promise.all(
+      imgs.map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise((resolve) => {
+              const done = () => resolve();
+              img.addEventListener('load', done, { once: true });
+              img.addEventListener('error', done, { once: true });
+              // Belt and braces: never block the run on one stubborn asset.
+              setTimeout(done, Math.max(0, deadline - Date.now()));
+            }),
+      ),
+    );
+    // Let the decoder catch up before the pixel capture.
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  }, budgetMs);
+}
+
 const results = [];
 const problems = [];
 
@@ -104,11 +147,17 @@ for (const scheme of ['light', 'dark']) {
 
     if (scheme === 'light') {
       const shot = join(REVIEW, `${route.name}-desktop.png`);
-      if (!QUICK) await page.screenshot({ path: shot, fullPage: true });
+      if (!QUICK) {
+        await settleImages(page);
+        await page.screenshot({ path: shot, fullPage: true });
+      }
       results.push({ route: route.name, scheme, loadMs, violations, overflow, consoleErrors, failedRequests, shot });
     } else {
       const shot = join(REVIEW, `${route.name}-dark.png`);
-      if (!QUICK) await page.screenshot({ path: shot, fullPage: true });
+      if (!QUICK) {
+        await settleImages(page);
+        await page.screenshot({ path: shot, fullPage: true });
+      }
       results.push({ route: route.name, scheme, loadMs, violations, overflow, consoleErrors, failedRequests, shot });
     }
 
@@ -155,7 +204,10 @@ for (const scheme of ['light', 'dark']) {
       return { has: de.scrollWidth > de.clientWidth + 1, offenders: offenders.slice(0, 6) };
     });
     const shot = join(REVIEW, `${route.name}-mobile.png`);
-    if (!QUICK) await page.screenshot({ path: shot, fullPage: true });
+    if (!QUICK) {
+      await settleImages(page);
+      await page.screenshot({ path: shot, fullPage: true });
+    }
     results.push({ route: route.name, scheme: 'mobile', violations, overflow, shot });
     if (violations.filter((v) => v.impact === 'critical' || v.impact === 'serious').length)
       problems.push(`${route.path} [mobile] ${violations.filter((v) => v.impact === 'critical' || v.impact === 'serious').length} serious/critical a11y violations`);
