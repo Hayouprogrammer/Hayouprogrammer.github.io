@@ -238,6 +238,42 @@ const meta: Array<[string, string]> = [
         into the profile so every future environment picks it up automatically.
       </p>
     </div>
+
+    <!-- The operator's view of the fleet. -->
+    <div class="mt-16 grid gap-10 lg:grid-cols-[1fr_0.72fr] lg:items-start">
+      <div>
+        <p class="label text-ink-500">What operating it looks like</p>
+        <h3 class="mt-3 text-3xl">One screen answers "is anything on fire?"</h3>
+        <p class="mt-4 max-w-prose text-lg text-ink-700">
+          The operator console is the control plane's own home. It shows what needs
+          attention, how many environments are healthy, what was deployed last, and
+          whether the metering cron is still alive. A watchdog job runs alongside the
+          business-critical scheduled actions and raises an alert if that cron itself
+          dies — the monitoring is monitored.
+        </p>
+      </div>
+      <Shot
+        file="dashboard.png"
+        plate="FIG. 07"
+        caption="The operations console: fleet health, what needs attention, and the deployment feed."
+        alt="Imbirt Ops console showing system health, environments needing attention and a recent deployments feed"
+        measure="1600 × 1000"
+      />
+    </div>
+
+    <div class="mt-10 flex flex-wrap items-center gap-6">
+      <Shot
+        file="mobile-dashboard.png"
+        plate="FIG. 08"
+        caption="The same console on a phone, at 420 px."
+        alt="Imbirt Ops console rendered at a mobile viewport"
+        aspect="420 / 900"
+      />
+      <p class="max-w-xs text-sm text-ink-500 lg:pt-6">
+        An ERP nobody can check from the corridor of their own hotel is a desktop
+        application, not an operating system.
+      </p>
+    </div>
   </section>
 
   <!-- ================= § 04 ISOLATION ================= -->
@@ -371,18 +407,23 @@ const meta: Array<[string, string]> = [
         </ul>
       </div>
       <div class="grid gap-6 sm:grid-cols-2">
-        <Shot file="hotel-frontdesk.png" plate="FIG. 08" caption="Reservations at the front desk." alt="Imbirt hotel reservations list" />
-        <Shot file="housekeeping.png" plate="FIG. 09" caption="The housekeeping lifecycle." alt="Imbirt housekeeping board" />
-        <Shot file="dashboard.png" plate="FIG. 10" caption="The executive dashboard — occupancy, collections, delinquency." alt="Imbirt executive dashboard" />
-        <Shot file="pos.png" plate="FIG. 11" caption="White-labelled Point of Sale." alt="Imbirt white-labelled point of sale" />
+        <Shot file="hotel-frontdesk.png" plate="FIG. 09" caption="Reservations at the front desk." alt="Imbirt hotel reservations list" />
+        <Shot file="housekeeping.png" plate="FIG. 10" caption="The housekeeping lifecycle." alt="Imbirt housekeeping board" />
+        <Shot file="tenant-dashboard.png" plate="FIG. 11" caption="The tenant executive dashboard: occupancy, collections, delinquency." alt="Imbirt executive dashboard" />
+        <Shot file="pos.png" plate="FIG. 12" caption="White-labelled Point of Sale." alt="Imbirt white-labelled point of sale" />
       </div>
+      <p class="mt-4 max-w-prose text-sm text-ink-500">
+        These plates are captured from a provisioned hospitality tenant. Until that
+        tenant is provisioned and seeded, the panels above say so rather than
+        showing an empty list and calling it the product.
+      </p>
     </div>
 
-    <div class="mt-12 flex flex-wrap items-center gap-3 lg:pl-0">
-      <Shot file="mobile-dashboard.png" plate="FIG. 12" caption="The same dashboard on a phone — the ERP shell is responsive." alt="Imbirt dashboard on a mobile viewport" />
+    <div class="mt-12 flex flex-wrap items-center gap-6">
+      <Shot file="tenant-dashboard-mobile.png" plate="FIG. 12" caption="The tenant dashboard on a phone, at 420 px." alt="Imbirt tenant executive dashboard on a mobile viewport" aspect="420 / 900" />
       <p class="max-w-xs text-sm text-ink-500 lg:pt-6">
-        An ERP nobody can check from the corridor of their own hotel is a
-        desktop application, not an operating system.
+        An ERP nobody can check from the corridor of their own hotel is a desktop
+        application, not an operating system.
       </p>
     </div>
 

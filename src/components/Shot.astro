@@ -33,12 +33,22 @@ const stem = `/shots/${file.replace(/\.[^.]+$/, '')}`;
     priority={priority}
   />
 ) : (
-  <figure class="border border-dashed border-rule-strong bg-paper-raised p-8">
-    <div class="flex items-baseline justify-between gap-4">
-      <span class="label text-brass-600 tnum">{plate}</span>
-      <span class="label text-oxblood">{captured ? 'Not optimised' : 'Not captured'}</span>
+  <figure>
+    <div
+      class="flex items-center justify-center border border-dashed border-rule-strong bg-paper-raised px-6 py-10 text-center"
+      style={`aspect-ratio: ${aspect ?? '16 / 10'}`}
+    >
+      <div>
+        <p class="label text-ink-500">{plate} — capture pending</p>
+        <p class="mx-auto mt-2 max-w-[22ch] text-sm text-ink-500">{caption}</p>
+      </div>
     </div>
-    <p class="mt-3 text-sm text-ink-700">{caption}</p>
-    <p class="mt-1 font-mono text-xs text-ink-500">public/screens/{file}</p>
+    <figcaption class="mt-2.5 flex items-baseline justify-between gap-4">
+      <span class="flex items-baseline gap-2.5">
+        <span class="label text-brass-600 tnum">{plate}</span>
+        <span class="text-sm text-ink-700">{caption}</span>
+      </span>
+      {measure && <span class="label hidden shrink-0 text-ink-300 tnum sm:inline">{measure}</span>}
+    </figcaption>
   </figure>
 )}
