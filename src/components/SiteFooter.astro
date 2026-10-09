@@ -1,0 +1,39 @@
+---
+import contact from '../data/contact.json';
+
+const year = new Date().getFullYear();
+const email = contact.channels.find((c) => c.id === 'email');
+const telegram = contact.channels.find((c) => c.id === 'telegram');
+---
+
+<footer class="no-print mt-24 border-t border-rule">
+  <div class="dossier mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <div class="grid gap-8 py-10 sm:grid-cols-[1fr_auto] sm:items-end">
+      <div class="max-w-prose">
+        <p class="label text-ink-500">Colophon</p>
+        <p class="mt-3 text-sm text-ink-700">
+          Built by hand with Astro and self-hosted type. No trackers, no cookie
+          banner, no third-party font request. Every figure on this site is
+          re-derivable from the
+          <a href={contact.github.repo}>public repository</a>.
+        </p>
+      </div>
+
+      <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm sm:text-right">
+        <dt class="label text-ink-500">Location</dt>
+        <dd class="tnum text-ink-700">{contact.principal.location}</dd>
+        <dt class="label text-ink-500">Email</dt>
+        <dd><a class="tnum text-ink-900" href={email?.href}>{email?.value}</a></dd>
+        <dt class="label text-ink-500">Telegram</dt>
+        <dd><a class="tnum text-ink-900" href={telegram?.href}>{telegram?.value}</a></dd>
+      </dl>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-rule py-5">
+      <p class="label text-ink-300 tnum">© {year} {contact.principal.name}</p>
+      <p class="label text-ink-300">
+        <span class="geez">እምብርት</span> — Imbirt
+      </p>
+    </div>
+  </div>
+</footer>

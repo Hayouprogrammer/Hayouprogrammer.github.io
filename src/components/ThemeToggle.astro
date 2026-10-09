@@ -1,0 +1,17 @@
+---
+/**
+ * ThemeToggle — "Sheet" (printed paper) vs "Binding" (the leather ledger cover).
+ * A single accessible name that contains the visible word, so axe's
+ * label-content-name check passes without a redundant aria-label.
+ */
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  class="label border border-rule px-2 py-1.5 text-ink-500 transition-colors hover:border-rule-strong hover:text-ink-900"
+>
+  <span class="theme-label-light">Sheet</span>
+  <span class="theme-label-dark hidden">Binding</span>
+  <span class="sr-only"> — switch the appearance</span>
+</button>

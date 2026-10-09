@@ -1,0 +1,5 @@
+{
+  "$comment": "Edit `target` when the domain changes, then re-run `node scripts/make-qr.mjs` and reprint. Never print a code that points at a hosting subdomain.",
+  "target": "https://hayelom.pages.dev/imbirt",
+  "vcard": "https://hayelom.pages.dev/contact"
+}

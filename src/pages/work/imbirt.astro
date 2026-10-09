@@ -1,0 +1,552 @@
+---
+import Base from '../../layouts/Base.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Shot from '../../components/Shot.astro';
+import RuleTable from '../../components/RuleTable.astro';
+import Stamp from '../../components/Stamp.astro';
+import ContactBand from '../../components/ContactBand.astro';
+import ArchitectureSection from '../../components/ArchitectureSection.astro';
+import AiGovernanceFigure from '../../components/AiGovernanceFigure.astro';
+import QrTracker from '../../components/QrTracker.astro';
+import figures from '../../data/figures.json';
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+
+const meta: Array<[string, string]> = [
+  ['Product', 'Imbirt — Ethiopian ERP platform'],
+  ['Role', 'Sole designer and engineer'],
+  ['Stack', 'Odoo 19.0 Community · Python 3.12 · PostgreSQL 16 · Docker'],
+  ['Scale', `${fmt(figures.code.customTrees)} custom addons · ${fmt(figures.code.lines)} lines · ${fmt(figures.tests.functions)} tests`],
+  ['Licence', 'LGPL-3 for Imbirt code · no Odoo Enterprise'],
+  ['Repository', 'github.com/Hayouprogrammer/ethio-erp-addons'],
+];
+---
+
+<Base
+  title="Case study: Imbirt — a multi-tenant ERP on Odoo 19 | Hayelom Gebrewahid"
+  description="How I designed and built Imbirt: one platform that provisions a hotel, a property portfolio or a trading business in one action, with one PostgreSQL database per tenant and an AI assistant that never writes without asking."
+  plate="CS. 01"
+>
+  <!-- ================= MASTHEAD ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
+    <a href="/work" class="label text-ink-500 no-underline hover:text-ink-900">← All work</a>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <span class="label text-brass-600">Case study 01 — Flagship</span>
+      <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+      <span class="label text-ink-500">Imbirt — <span class="geez">እምብርት</span> · "core"</span>
+    </div>
+
+    <h1 class="mt-5 max-w-4xl text-[clamp(2.25rem,6vw,4rem)] leading-[0.98]">
+      A multi-tenant ERP that provisions a business in one action — and never lets
+      the AI write anything you haven't confirmed.
+    </h1>
+
+    <p class="mt-6 max-w-prose text-lg text-ink-700 text-pretty">
+      Imbirt runs hospitality, property and trading businesses on Odoo 19 Community.
+      It was designed from the first commit around one question: what does it take
+      for a hotel in Addis Ababa to get a system that is genuinely theirs, isolated
+      from every other customer, and safe to let an AI assistant touch?
+    </p>
+
+    <div class="mt-8 flex flex-wrap gap-2">
+      <Stamp tone="ledger">Odoo 19.0 Community</Stamp>
+      <Stamp tone="brass">LGPL-3</Stamp>
+      <Stamp tone="ink">No Enterprise code</Stamp>
+      <Stamp tone="brass">One database per tenant</Stamp>
+    </div>
+
+    <div class="dim-rule mt-10" aria-hidden="true" />
+  </section>
+
+  <!-- ================= META TABLE ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6">
+    <RuleTable caption="Table 1 — the record" rows={meta} />
+  </section>
+
+  <!-- ================= § 01 THE PROBLEM ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 01"
+      kicker="The problem"
+      title="Three industries, one shared spreadsheet, and no affordable answer."
+      lede="Ethiopian hotels and landlords are not short of software problems. They are short of software that fits."
+    />
+
+    <div class="mt-10 grid gap-12 lg:grid-cols-[1fr_0.85fr]">
+      <div class="max-w-prose text-lg text-ink-700">
+        <p>
+          A 25-room hotel in Addis runs front desk on a paper folio, housekeeping
+          on WhatsApp, and revenue on a spreadsheet somebody's cousin maintains. A
+          property landlord with eighty units tracks rent in an Excel file with a
+          pivot table that broke in 2024. They know this is costing them money. What
+          they cannot do is buy a $40,000-per-year international platform.
+        </p>
+        <p class="mt-4">
+          Odoo Community is genuinely good software and it is free. But out of the
+          box it is a single-employee tool: one company, one database, everybody
+          shares everything. It has no concept of a customer, no way to hand a hotel
+          its own isolated instance, and no accounting for Ethiopian realities like
+          withholding tax.
+        </p>
+        <p class="mt-4">
+          Odoo Enterprise solves some of this and costs more per user than a
+          front-desk clerk earns in a month. So the honest brief was: build the
+          multi-tenant, industry-aware layer <em>on top of Community</em>, without
+          touching a line of Enterprise code, and keep it small enough that one
+          person can maintain it.
+        </p>
+      </div>
+
+      <div class="border border-rule bg-paper-raised p-6">
+        <p class="label text-ink-500">What was ruled out, and why</p>
+        <dl class="mt-4 space-y-4 text-sm">
+          <div>
+            <dt class="font-medium text-ink-900">Odoo Enterprise</dt>
+            <dd class="mt-1 text-ink-700">Priced per user, far above the Ethiopian market. Also a licence obligation the client could not meet.</dd>
+          </div>
+          <div class="border-t border-rule pt-4">
+            <dt class="font-medium text-ink-900">A foreign SaaS ERP</dt>
+            <dd class="mt-1 text-ink-700">Data leaves the country, no Ethiopian tax handling, and support hours are the wrong timezone.</dd>
+          </div>
+          <div class="border-t border-rule pt-4">
+            <dt class="font-medium text-ink-900">Multi-company inside one database</dt>
+            <dd class="mt-1 text-ink-700">Cheap to build, but one bad record rule leaks data between customers. Isolation has to be architectural, not policy.</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= § 02 WHAT I BUILT ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 02"
+      kicker="What I built"
+      title="Three planes, and the boundaries between them are decisions, not defaults."
+    />
+
+    <div class="mt-8 max-w-prose text-lg text-ink-700">
+      <p>
+        The whole platform is three planes. The control plane knows who the tenants
+        are and what state they are in. The data plane is where each tenant's data
+        physically lives. The application plane is what the tenant's staff actually
+        see when they log in. Keeping those three apart — and drawing the boundaries
+        explicitly — is what makes the system operable by one person.
+      </p>
+    </div>
+
+    <ArchitectureSection />
+
+    <div class="grid gap-8 lg:grid-cols-3">
+      {[
+        {
+          n: 'Plane 01',
+          t: 'Control',
+          b: 'Tenant registry, provisioning, lifecycle (create → suspend → archive → export), metering against plan limits, and per-package role presets. One operator runbook covers the whole fleet.',
+          file: 'tenant-ops-tenants.png',
+          plate: 'FIG. 02',
+          cap: 'The tenant registry: package, plan, state and live usage on one screen.',
+        },
+        {
+          n: 'Plane 02',
+          t: 'Data',
+          b: 'Each tenant gets its own PostgreSQL database with its own least-privilege role. Backups, restores and exports are per-tenant operations, not a WHERE clause somewhere.',
+          file: 'tenant-provision.png',
+          plate: 'FIG. 03',
+          cap: 'Provisioning a tenant: package, plan, AI switch — one action.',
+        },
+        {
+          n: 'Plane 03',
+          t: 'Application',
+          b: 'Choosing an application installs its whole install profile, not the base module. Pick Human Resources and all nineteen of its dependencies arrive. The customisation belongs in the profile, never in the tenant.',
+          file: 'apps-picker.png',
+          plate: 'FIG. 04',
+          cap: 'The application catalog, read by the picker, the install pipeline and the removal path.',
+        },
+      ].map((p) => (
+        <div>
+          <p class="label text-brass-600 tnum">{p.n}</p>
+          <h3 class="mt-2 text-2xl">{p.t}</h3>
+          <p class="mt-3 text-ink-700">{p.b}</p>
+          <div class="mt-5">
+            <Shot file={p.file} plate={p.plate} caption={p.cap} alt={p.cap} measure="1600 × 1000" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ================= § 03 PROVISIONING ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 03"
+      kicker="The core claim"
+      title="One action. Database, modules, admin, permissions, state — or nothing at all."
+      lede="The failure mode of most installers is a half-provisioned tenant: a database that exists, a module set half-installed, a user with no groups. Imbirt rolls the whole thing back."
+    />
+
+    <div class="mt-10 grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+      <ol class="space-y-8">
+        {[
+          ['Create', 'The operator names the tenant and picks a package — hospitality, property or business. Draft state. Nothing has been built yet.'],
+          ['Provision', 'One action: a PostgreSQL database is created and its privileges separated by role; the package install profile runs; the owner is granted exactly the native Odoo groups that job needs; the AI group is granted if AI is enabled.'],
+          ['Verify', 'State flips to Active with a chatter note recording the package. If any step raises, the entire provision is rolled back — there is no partial tenant.'],
+          ['Operate', 'Metering counts live users against the plan limit; crossing it flips an over-limit flag and raises an ops warning. A watchdog job alerts if the metering cron itself dies.'],
+          ['Hand back', 'Suspend, reactivate, archive, or export the whole tenant database as a dump file — the data-handover promise delivered as a button.'],
+        ].map(([t, b], i) => (
+          <li class="grid grid-cols-[2.5rem_1fr] gap-4">
+            <span class="font-display text-3xl text-brass-600 tnum">{String(i + 1).padStart(2, '0')}</span>
+            <span>
+              <span class="block font-display text-xl text-ink-900">{t}</span>
+              <span class="mt-1.5 block text-ink-700">{b}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <div class="space-y-8">
+        <Shot
+          file="tenant-provision.png"
+          plate="FIG. 05"
+          caption="The tenant form. Package, plan, AI switch, and the Provision action."
+          alt="Imbirt tenant form with package, plan and AI-enabled fields"
+          measure="1600 × 1000"
+        />
+        <Shot
+          file="tenant-ops-tenants.png"
+          plate="FIG. 06"
+          caption="After provisioning: state badges, package, and live user counts against plan limits."
+          alt="Imbirt tenants list showing active tenants with state badges and usage counts"
+          measure="1600 × 1000"
+        />
+      </div>
+    </div>
+
+    <div class="mt-12 border border-rule bg-paper-raised p-6">
+      <div class="flex items-baseline gap-3">
+        <span class="label text-brass-600">A decision worth naming</span>
+        <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+        <span class="label text-ink-500">Install profiles</span>
+      </div>
+      <div class="dim-rule mt-4" aria-hidden="true"></div>
+      <p class="mt-5 max-w-prose text-ink-700">
+        Choosing <em>any</em> application installs its whole install profile, not the base
+        module. A verified run with Point of Sale and Human Resources selected installed
+        159 modules — the HR profile alone contributed all nineteen of them. Before that,
+        "install HR" left you with an unusable shell. The fix was to move the customisation
+        into the profile so every future environment picks it up automatically.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= § 04 ISOLATION ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 04"
+      kicker="Isolation"
+      title="One tenant, one database — enforced by PostgreSQL, not by a WHERE clause."
+      lede="This is the claim I would most want a technical buyer to interrogate, so here is the mechanism rather than the marketing."
+    />
+
+    <div class="mt-10 grid gap-10 lg:grid-cols-2">
+      <div class="text-lg text-ink-700">
+        <p>
+          Every tenant lives in its own PostgreSQL database. The control plane
+          connects to each one through a role that holds only the privileges that
+          tenant needs, and the tenant's own application connects through a separate,
+          narrower role again. A misconfigured record rule in one tenant cannot read
+          another tenant's rows, because the other tenant's rows are in a different
+          database on a different role.
+        </p>
+        <p class="mt-4">
+          Host routing resolves <span class="font-mono text-base text-ink-900">tenant.imbirt.et</span>
+          to a database at the server layer, and fails closed for an unknown host — an
+          unrecognised domain does not fall through to a default tenant. The database is
+          never published from the production Compose profile; only the application port
+          is bound, to loopback, behind the TLS proxy.
+        </p>
+      </div>
+
+      <RuleTable
+        caption="Table 2 — the isolation contract"
+        rows={[
+          ['Tenant boundary', 'One PostgreSQL database per tenant', 'no shared tables, no shared filestore'],
+          ['Privileges', 'Separate least-privilege roles', 'control plane and tenant app connect differently'],
+          ['Host routing', 'Server-wide header resolution', 'fails closed on unknown host'],
+          ['Production DB port', 'Not published', 'Compose network only'],
+          ['Application bind', '127.0.0.1 only', 'reverse proxy terminates TLS in front'],
+          ['Database listing', 'Disabled', 'no /web/database/manager on production'],
+        ]}
+      />
+    </div>
+  </section>
+
+  <!-- ================= § 05 AI ================= -->
+  <section id="ai" class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 05"
+      kicker="The governed assistant"
+      title="The AI can prepare anything. It can only write what you confirmed."
+      lede="An assistant inside an ERP is only useful if you can trust it with your books. So writes go through a preview card first — always, for anything that changes data."
+    />
+
+    <div class="mt-10 grid gap-12 lg:grid-cols-[1fr_1fr]">
+      <div>
+        <ol class="space-y-6">
+          {[
+            ['Ask', 'The user asks in plain language: "book room 204 for Mikael Tesfaye, arriving Friday."'],
+            ['Prepare', 'The assistant calls a tool that only assembles a preview object. Nothing is written to the database at this step.'],
+            ['Preview', 'The preview card shows exactly the fields that will be written, with the values resolved from real records.'],
+            ['Confirm', 'The user confirms in the chat UI. Only then does the write execute, against a persisted pending action.'],
+            ['Execute', 'The write runs, logged, attributed, and reversible through the normal Odoo audit trail.'],
+          ].map(([t, b], i) => (
+            <li class="grid grid-cols-[2rem_1fr] gap-4 border-b border-rule pb-5 last:border-0">
+              <span class="label text-brass-600 tnum pt-1">{String(i + 1).padStart(2, '0')}</span>
+              <span>
+                <span class="block font-medium text-ink-900">{t}</span>
+                <span class="mt-1 block text-ink-700">{b}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+
+        <div class="mt-8 border border-rule bg-paper-raised p-6">
+          <p class="label text-ink-500">The risk-tier rule</p>
+          <ul class="mt-3 space-y-2 text-sm text-ink-700">
+            <li class="flex gap-3"><span class="label shrink-0 text-ledger-500">READ</span><span>Never asks. Reads are always free.</span></li>
+            <li class="flex gap-3"><span class="label shrink-0 text-brass-600">LOW</span><span>May auto-execute only if an administrator has explicitly enabled that policy.</span></li>
+            <li class="flex gap-3"><span class="label shrink-0 text-oxblood">MEDIUM+</span><span>Always requires an explicit user confirmation. This is the default for every write.</span></li>
+          </ul>
+          <p class="mt-4 text-xs text-ink-500">
+            The assistant talks to a cloud LLM over an OpenAI-compatible API. The provider
+            is swappable and each tenant brings its own key, so no tenant's data crosses
+            into another tenant's billing.
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-8">
+        <AiGovernanceFigure />
+        <p class="text-sm text-ink-500">
+          Every tool declares its own risk tier in its definition — writes default to
+          <span class="font-mono">medium</span> and therefore always ask. A tool cannot opt
+          out of the safety model by accident, because the declaration is not a policy applied
+          afterwards.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= § 06 VERTICALS ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 06"
+      kicker="The verticals"
+      title="Hospitality and property, built on the same spine."
+    />
+
+    <div id="hospitality" class="mt-10 grid gap-12 lg:grid-cols-[1fr_1fr]">
+      <div>
+        <h3 class="text-3xl">Hospitality</h3>
+        <p class="mt-4 text-lg text-ink-700">
+          Front desk, reservations, rate plans, guest folios and a real night audit.
+          Housekeeping is wired to checkout: a room cannot be released for sale again
+          until the cleaning task has been inspected. That single gate is the
+          difference between a housekeeping board and a housekeeping control.
+        </p>
+        <ul class="mt-5 space-y-2 text-ink-700">
+          {[
+            'Reservations with stage wiring and approval history',
+            'Folio billing with rate plans and night audit',
+            'Checkout-triggered cleaning with inspection gating',
+            'White-labelled POS — receipts, display and errors',
+            'Executive dashboard: occupancy, collections, delinquency',
+          ].map((i) => (
+            <li class="flex gap-3">
+              <span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span>
+              <span>{i}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2">
+        <Shot file="hotel-frontdesk.png" plate="FIG. 08" caption="Reservations at the front desk." alt="Imbirt hotel reservations list" />
+        <Shot file="housekeeping.png" plate="FIG. 09" caption="The housekeeping lifecycle." alt="Imbirt housekeeping board" />
+        <Shot file="dashboard.png" plate="FIG. 10" caption="The executive dashboard — occupancy, collections, delinquency." alt="Imbirt executive dashboard" />
+        <Shot file="pos.png" plate="FIG. 11" caption="White-labelled Point of Sale." alt="Imbirt white-labelled point of sale" />
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap items-center gap-3 lg:pl-0">
+      <Shot file="mobile-dashboard.png" plate="FIG. 12" caption="The same dashboard on a phone — the ERP shell is responsive." alt="Imbirt dashboard on a mobile viewport" />
+      <p class="max-w-xs text-sm text-ink-500 lg:pt-6">
+        An ERP nobody can check from the corridor of their own hotel is a
+        desktop application, not an operating system.
+      </p>
+    </div>
+
+    <div id="property" class="mt-20 grid gap-12 lg:grid-cols-[1fr_1fr]">
+      <div class="lg:order-2">
+        <h3 class="text-3xl">Property &amp; real estate</h3>
+        <p class="mt-4 text-lg text-ink-700">
+          A lease that invoices itself is the whole product for a landlord. Contracts
+          carry the rent schedule; the schedule raises the invoices; the owner's
+          statement is generated from the same ledger — management fees and
+          disbursements included, so the number an owner sees reconciles to the
+          accounting system rather than to a second spreadsheet.
+        </p>
+        <ul class="mt-5 space-y-2 text-ink-700">
+          {[
+            'Lease contracts with automatic rent schedules and invoicing',
+            'Deposits, maintenance and utility metering',
+            'Unit-sale pipeline with offers, deposits and agent commissions',
+            'Owner trust accounting — statements, fees, disbursements',
+            'Rent-roll and delinquency reporting',
+          ].map((i) => (
+            <li class="flex gap-3">
+              <span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span>
+              <span>{i}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:order-1">
+        <Shot file="property-portfolio.png" plate="FIG. 13" caption="The property portfolio." alt="Imbirt property portfolio kanban" />
+        <Shot file="lease.png" plate="FIG. 14" caption="A lease contract with its rent schedule." alt="Imbirt lease contract form" />
+        <Shot file="report-rent-roll.png" plate="FIG. 15" caption="The rent roll and delinquency report." alt="Imbirt rent roll report" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= § 07 ENGINEERING ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 07"
+      kicker="Engineering"
+      title="The part a technical buyer should ask about."
+      lede="A one-person platform is only credible if the repository shows the discipline. These are the checks that are running, not the ones that were planned."
+    />
+
+    <div class="mt-10 grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-2xl">Tests that actually run</h3>
+          <p class="mt-2 text-ink-700">
+            {fmt(figures.tests.functions)} test functions across {fmt(figures.tests.files)} files,
+            exercised by a GitHub Actions matrix on PostgreSQL 16. The suite is the reason
+            a change to the AI tool loop can be made without guessing what it broke. When a
+            test contradicted itself, the test was fixed — not deleted to make the run green.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-2xl">Deleting 43 files was the right call</h3>
+          <p class="mt-2 text-ink-700">
+            Imbirt originally shipped a bespoke access-control engine: a role matrix, a
+            segregation-of-duties engine, a permission simulator and an AI bridge. Odoo's
+            native groups turned out to do the same job with less to maintain and fewer
+            places to be wrong. The module was deleted, and what it uniquely did — role
+            bundles per package and an owner tier reconciled from the menu tree — was
+            reimplemented as native <span class="font-mono text-base text-ink-900">res.groups</span>.
+            Deleting code is engineering too.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-2xl">Provenance is audited, not asserted</h3>
+          <p class="mt-2 text-ink-700">
+            {fmt(figures.repo.addonTrees)} addon trees sit on the path: Imbirt's own, curated
+            OCA modules, and vendored upstream. Every one is inventoried with a provenance
+            class and a CycloneDX SBOM, and a compliance review confirms no Odoo Enterprise
+            code is used. A customer's lawyer can check the same file I did.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-2xl">Disaster recovery is rehearsed</h3>
+          <p class="mt-2 text-ink-700">
+            WAL archiving, base backups and point-in-time recovery are scripted, and the
+            drills are run as exercises with evidence written down. A backup nobody has
+            restored is a rumour.
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <Shot file="login.png" plate="FIG. 16" caption="The white-labelled login — the tenant's own brand from the first screen." alt="Imbirt branded login screen" measure="1600 × 1000" />
+        <RuleTable
+          caption="Table 3 — what CI enforces"
+          rows={[
+            ['Lint', 'Ruff across the custom trees', 'pre-commit gate, must be green'],
+            ['Type & import health', 'Astro check on this site', 'separate pipeline'],
+            ['Odoo tests', 'Module matrix on PostgreSQL 16', 'the same major version as production'],
+            ['Provenance', 'Licence inventory + dependency check', 'fails on a new unlicensed tree'],
+            ['Security posture', 'Demo data off, DB unpublished, addons read-only, proxy mode on', 'production Compose profile'],
+          ]}
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= § 08 HONEST LIMITS ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 08"
+      kicker="Honest limits"
+      title="What is not finished, stated plainly."
+      lede="I would rather you heard this from me than found it in a pilot. Every item below is recorded in the project's own current-state document."
+    />
+
+    <div class="mt-10 max-w-3xl">
+      <RuleTable
+        caption="Table 4 — open defects, from docs/CURRENT_STATE.md"
+        rows={[
+          ['Inline record save', 'A filled user record can look saved without reaching the database', 'needs a focused repro and a fix'],
+          ['Application-set report', 'A non-sellable dependency is reported as installed-but-not-sold', 'cosmetic in the operator UI'],
+          ['Package role presets', 'Presets exist for hospitality and property only', 'business package has none yet'],
+          ['Withholding mechanics', 'The 2% withholding is computed manually', 'vendor the OCA Ethiopia module'],
+        ]}
+      />
+      <p class="mt-4 text-sm text-ink-500">
+        The AI security boundary and runtime commercial entitlements are separately
+        verified workstreams — I will not describe them as closed until they are.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= § 09 OUTCOME ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 09"
+      kicker="Outcome"
+      title="One person now operates the whole fleet."
+    />
+
+    <div class="mt-10 grid gap-px border border-rule bg-rule sm:grid-cols-3">
+      {[
+        ['From zero to a running hotel ERP', 'One action: database, 14-module hospitality profile, admin, groups, state. Rolled back whole on failure.'],
+        ['From shared to isolated', 'Every tenant in its own PostgreSQL database, on its own least-privilege role. One tenant going wrong cannot reach another.'],
+        ['From powerful to safe', 'An AI assistant inside an ERP that prepares anything and writes only what a human confirmed.'],
+      ].map(([t, b]) => (
+        <div class="bg-paper p-7">
+          <h3 class="text-xl">{t}</h3>
+          <p class="mt-2.5 text-ink-700">{b}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-10 flex flex-wrap items-center gap-3">
+      <a href="/contact" class="label inline-flex items-center gap-2 bg-ledger-900 px-5 py-3.5 text-bone no-underline transition-colors hover:bg-ledger-700">
+        Talk to me about your system <span aria-hidden="true">→</span>
+      </a>
+      <a href={figures.repo.remote ?? '#'} class="label inline-flex items-center gap-2 border border-rule-strong px-5 py-3.5 no-underline transition-colors hover:bg-paper-raised">
+        Read the repository
+      </a>
+    </div>
+  </section>
+
+  <ContactBand
+    title="Want this for your hotel or portfolio?"
+    body="Bring me the spreadsheet you actually use. I will tell you what Imbirt replaces, what it does not, and what a pilot would look like."
+    primaryLabel="Email me"
+  />
+  <QrTracker />
+</Base>

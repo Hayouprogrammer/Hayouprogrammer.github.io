@@ -1,0 +1,247 @@
+---
+/**
+ * AiGovernanceFigure — how a governed write actually works.
+ *
+ * A measured figure, not a product mock. It draws the three things that make
+ * the assistant safe, all read from the source:
+ *
+ *   1. THE RISK LADDER — the tier a tool declares decides whether it may
+ *      execute without asking. Read tools never confirm; low may auto-execute
+ *      only if an administrator allows it; medium and above always ask.
+ *   2. THE PREVIEW PAYLOAD — the exact keys the reservation previewer returns,
+ *      including the phone masked by the privacy policy so raw contact never
+ *      leaves the server unmasked.
+ *   3. THE PENDING RECORD — `imbirt.ai.pending.action`, persisted rather than
+ *      held in process memory, single-use via a conditional UPDATE, expiring
+ *      after PENDING_ACTION_TTL_MINUTES.
+ *
+ * Sources: addons/imbirt_ai/models/ai_agent.py (risk tiers, previewer),
+ * addons/imbirt_ai/models/ai_pending_action.py (record, TTL, `take()`).
+ * Only the values are illustrative.
+ *
+ * Layout budget — keep these bands inside the viewBox:
+ *   header   0–26    band 1  52–248    band 2  286–684
+ *   band 3   724–1062                footer  1096–1134
+ */
+
+// Rendered as variables: a literal `{` inside an Astro template starts an
+// expression, and a JSON sample is text, not an expression.
+const argsSample = '{ "room_name": "204", "date_from": "2026-11-13", ... }';
+const previewSample = '{ "kind": "reservation", "risk": "medium", ... }';
+---
+
+<figure class="governance-figure my-10">
+  <div class="border border-rule bg-paper-raised p-4 shadow-plate sm:p-6">
+    <svg
+      viewBox="0 0 900 1160"
+      role="img"
+      aria-labelledby="gov-title gov-desc"
+      class="block h-auto w-full"
+      font-family="var(--font-body)"
+    >
+      <title id="gov-title">How a governed AI write works: the risk ladder, the preview payload, and the pending record</title>
+      <desc id="gov-desc">
+        First, a ladder of four risk tiers. Read never asks. Low may execute
+        automatically only when an administrator has allowed it. Medium and
+        above always require the user to confirm, and medium is the default for
+        every write tool. Second, the preview payload the reservation tool
+        returns: kind, risk, room, guest name, a masked phone number, check-in
+        and check-out dates and a derived night count. Third, the pending action
+        record that stores the write until it is confirmed, with its token,
+        tool name, arguments, preview, state and fifteen minute expiry.
+      </desc>
+
+      <!-- hatching used to mark the one masked value -->
+      <defs>
+        <pattern id="gov-mask" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--brass-600)" stroke-width="1" opacity="0.35" />
+        </pattern>
+      </defs>
+
+      <!-- ================= header ================= -->
+      <text x="0" y="14" fill="var(--brass-600)" font-size="10" font-weight="700" letter-spacing="1.8">FIG. 07 — THE GOVERNED WRITE</text>
+      <text x="900" y="14" text-anchor="end" fill="var(--ink-300)" font-size="9.5" letter-spacing="1.4">DRAWN FROM addons/imbirt_ai</text>
+      <line x1="0" y1="26" x2="900" y2="26" stroke="var(--rule-strong)" />
+
+      <!-- ================= band 1: the risk ladder ================= -->
+      <g>
+        <text x="0" y="52" fill="var(--ink-900)" font-size="10" font-weight="700" letter-spacing="1.6">1 · THE RISK LADDER</text>
+        <text x="0" y="70" fill="var(--ink-500)" font-size="11">Every tool declares its own tier in its definition. The tier is not a policy applied afterwards.</text>
+
+        <g transform="translate(0,84)">
+          <rect x="0" y="0" width="620" height="30" fill="var(--paper)" stroke="var(--rule)" />
+          <text x="14" y="20" fill="var(--ink-900)" font-size="12" font-weight="600">read</text>
+          <text x="120" y="20" fill="var(--ink-700)" font-size="11.5">never asks — a read is always free</text>
+
+          <rect x="0" y="38" width="620" height="30" fill="var(--paper)" stroke="var(--rule)" />
+          <text x="14" y="58" fill="var(--ink-900)" font-size="12" font-weight="600">low</text>
+          <text x="120" y="58" fill="var(--ink-700)" font-size="11.5">may auto-execute — only if an administrator enabled the policy</text>
+
+          <!-- the boundary -->
+          <line x1="0" y1="80" x2="620" y2="80" stroke="var(--brass-600)" stroke-width="2" />
+          <g stroke="var(--brass-600)" stroke-width="1">
+            <line x1="0" y1="74" x2="0" y2="86" />
+            <line x1="620" y1="74" x2="620" y2="86" />
+          </g>
+
+          <rect x="0" y="96" width="620" height="30" fill="var(--brass-200)" stroke="var(--brass-600)" />
+          <text x="14" y="116" fill="var(--ink-900)" font-size="12" font-weight="700">medium</text>
+          <text x="120" y="116" fill="var(--ink-700)" font-size="11.5">always asks — and this is the default for every write tool</text>
+
+          <rect x="0" y="134" width="620" height="30" fill="var(--paper)" stroke="var(--rule)" />
+          <text x="14" y="154" fill="var(--ink-700)" font-size="12" font-weight="600">high · critical</text>
+          <text x="200" y="154" fill="var(--ink-500)" font-size="11.5">reserved for destructive operations</text>
+
+          <line x1="640" y1="0" x2="640" y2="164" stroke="var(--rule)" />
+          <text x="664" y="24" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">THE BOUNDARY</text>
+          <text x="664" y="46" fill="var(--ink-700)" font-size="11">Nothing at or below this line</text>
+          <text x="664" y="62" fill="var(--ink-700)" font-size="11">reaches the database without</text>
+          <text x="664" y="78" fill="var(--ink-700)" font-size="11">a human confirming it.</text>
+          <text x="664" y="106" fill="var(--ink-500)" font-size="10.5">Read tools are declared</text>
+          <text x="664" y="122" fill="var(--ink-500)" font-size="10.5">risk=read; write tools inherit</text>
+          <text x="664" y="138" fill="var(--ink-500)" font-size="10.5">risk=medium unless they say</text>
+          <text x="664" y="154" fill="var(--ink-500)" font-size="10.5">otherwise.</text>
+        </g>
+      </g>
+
+      <!-- ================= band 2: the preview payload ================= -->
+      <g transform="translate(0,286)">
+        <text x="0" y="14" fill="var(--ink-900)" font-size="10" font-weight="700" letter-spacing="1.6">2 · THE PREVIEW PAYLOAD</text>
+        <text x="0" y="32" fill="var(--ink-500)" font-size="11">What the tool assembles before anything is written. This object is echoed into the transcript and onto the confirmation.</text>
+
+        <line x1="0" y1="46" x2="900" y2="46" stroke="var(--rule-strong)" />
+        <text x="0" y="64" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">KEY</text>
+        <text x="190" y="64" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">VALUE</text>
+        <text x="470" y="64" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">WHY IT IS THERE</text>
+        <line x1="0" y1="74" x2="900" y2="74" stroke="var(--rule)" />
+
+        <line x1="0" y1="106" x2="900" y2="106" stroke="var(--rule)" />
+        <text x="0" y="96" fill="var(--ink-900)" font-size="11.5" font-family="monospace">kind</text>
+        <text x="190" y="96" fill="var(--ink-700)" font-size="11.5">"reservation"</text>
+        <text x="470" y="96" fill="var(--ink-500)" font-size="11">the previewer's own discriminator</text>
+
+        <line x1="0" y1="140" x2="900" y2="140" stroke="var(--rule)" />
+        <text x="0" y="130" fill="var(--ink-900)" font-size="11.5" font-family="monospace">risk</text>
+        <text x="190" y="130" fill="var(--ink-700)" font-size="11.5">"medium"</text>
+        <text x="470" y="130" fill="var(--ink-500)" font-size="11">declared by the tool, so the card cannot downgrade itself</text>
+
+        <line x1="0" y1="174" x2="900" y2="174" stroke="var(--rule)" />
+        <text x="0" y="164" fill="var(--ink-900)" font-size="11.5" font-family="monospace">room</text>
+        <text x="190" y="164" fill="var(--ink-700)" font-size="11.5">"204 — Deluxe King"</text>
+        <text x="470" y="164" fill="var(--ink-500)" font-size="11">resolved against the real room record, not the user's wording</text>
+
+        <line x1="0" y1="208" x2="900" y2="208" stroke="var(--rule)" />
+        <text x="0" y="198" fill="var(--ink-900)" font-size="11.5" font-family="monospace">guest_name</text>
+        <text x="190" y="198" fill="var(--ink-700)" font-size="11.5">"Mikael Tesfaye"</text>
+        <text x="470" y="198" fill="var(--ink-500)" font-size="11">masked too, when the privacy policy requires it</text>
+
+        <!-- the one masked value: hatched, so the masking is visible not merely claimed -->
+        <line x1="0" y1="242" x2="900" y2="242" stroke="var(--rule)" />
+        <rect x="184" y="212" width="150" height="26" fill="url(#gov-mask)" />
+        <text x="0" y="232" fill="var(--ink-900)" font-size="11.5" font-family="monospace">guest_phone</text>
+        <text x="190" y="232" fill="var(--brass-600)" font-size="11.5" font-family="monospace">"+251 91****47"</text>
+        <text x="470" y="232" fill="var(--ink-500)" font-size="11">masked in the preview — the raw number never leaves the server</text>
+
+        <line x1="0" y1="276" x2="900" y2="276" stroke="var(--rule)" />
+        <text x="0" y="266" fill="var(--ink-900)" font-size="11.5" font-family="monospace">date_from</text>
+        <text x="190" y="266" fill="var(--ink-700)" font-size="11.5">"2026-11-13"</text>
+        <text x="470" y="266" fill="var(--ink-500)" font-size="11">rejected outright if it falls in the past</text>
+
+        <line x1="0" y1="310" x2="900" y2="310" stroke="var(--rule)" />
+        <text x="0" y="300" fill="var(--ink-900)" font-size="11.5" font-family="monospace">date_to</text>
+        <text x="190" y="300" fill="var(--ink-700)" font-size="11.5">"2026-11-16"</text>
+        <text x="470" y="300" fill="var(--ink-500)" font-size="11">must fall after check-in, or the previewer refuses</text>
+
+        <line x1="0" y1="344" x2="900" y2="344" stroke="var(--rule)" />
+        <text x="0" y="334" fill="var(--ink-900)" font-size="11.5" font-family="monospace">nights</text>
+        <text x="190" y="334" fill="var(--ink-700)" font-size="11.5">3</text>
+        <text x="470" y="334" fill="var(--ink-500)" font-size="11">derived, so the guest is never billed the wrong stay</text>
+
+        <line x1="0" y1="378" x2="900" y2="378" stroke="var(--rule)" />
+        <text x="0" y="368" fill="var(--ink-900)" font-size="11.5" font-family="monospace">summary</text>
+        <text x="190" y="368" fill="var(--ink-700)" font-size="11">"New reservation for 204 — Deluxe King: Mikael Tesfaye,</text>
+        <text x="190" y="384" fill="var(--ink-700)" font-size="11">2026-11-13 to 2026-11-16 (3 nights)"</text>
+        <text x="470" y="368" fill="var(--ink-500)" font-size="11">the operator approves a sentence,</text>
+        <text x="470" y="384" fill="var(--ink-500)" font-size="11">not a blob of JSON</text>
+      </g>
+
+      <!-- ================= band 3: the pending record ================= -->
+      <g transform="translate(0,724)">
+        <text x="0" y="14" fill="var(--ink-900)" font-size="10" font-weight="700" letter-spacing="1.6">3 · THE PENDING RECORD</text>
+        <text x="0" y="32" fill="var(--ink-500)" font-size="11">Between the preview and the write, the intent lives in the database — not in process memory.</text>
+
+        <line x1="0" y1="46" x2="900" y2="46" stroke="var(--rule-strong)" />
+        <text x="0" y="64" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">FIELD</text>
+        <text x="190" y="64" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">VALUE</text>
+        <text x="470" y="64" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">WHAT IT GUARANTEES</text>
+        <line x1="0" y1="74" x2="900" y2="74" stroke="var(--rule)" />
+
+        <g font-size="11.5">
+          <line x1="0" y1="106" x2="900" y2="106" stroke="var(--rule)" />
+          <text x="0" y="96" fill="var(--ink-900)" font-family="monospace">_name</text>
+          <text x="190" y="96" fill="var(--ink-700)" font-family="monospace">imbirt.ai.pending.action</text>
+          <text x="470" y="96" fill="var(--ink-500)" font-size="11">a model, not a variable</text>
+
+          <line x1="0" y1="132" x2="900" y2="132" stroke="var(--rule)" />
+          <text x="0" y="122" fill="var(--ink-900)" font-family="monospace">token</text>
+          <text x="190" y="122" fill="var(--ink-700)" font-family="monospace">9f2c4a...a41b</text>
+          <text x="470" y="122" fill="var(--ink-500)" font-size="11">uuid4 hex, indexed, required</text>
+
+          <line x1="0" y1="158" x2="900" y2="158" stroke="var(--rule)" />
+          <text x="0" y="148" fill="var(--ink-900)" font-family="monospace">user_id</text>
+          <text x="190" y="148" fill="var(--ink-700)" font-family="monospace">res.users(2)</text>
+          <text x="470" y="148" fill="var(--ink-500)" font-size="11">the confirmation belongs to one person</text>
+
+          <line x1="0" y1="184" x2="900" y2="184" stroke="var(--rule)" />
+          <text x="0" y="174" fill="var(--ink-900)" font-family="monospace">tool_name</text>
+          <text x="190" y="174" fill="var(--ink-700)" font-family="monospace">create_reservation</text>
+          <text x="470" y="174" fill="var(--ink-500)" font-size="11">a stale token cannot run a different tool</text>
+
+          <line x1="0" y1="210" x2="900" y2="210" stroke="var(--rule)" />
+          <text x="0" y="200" fill="var(--ink-900)" font-family="monospace">args_json</text>
+          <text x="190" y="200" fill="var(--ink-700)" font-family="monospace">{argsSample}</text>
+          <text x="470" y="200" fill="var(--ink-500)" font-size="11">frozen at preview time</text>
+
+          <line x1="0" y1="236" x2="900" y2="236" stroke="var(--rule)" />
+          <text x="0" y="226" fill="var(--ink-900)" font-family="monospace">preview_json</text>
+          <text x="190" y="226" fill="var(--ink-700)" font-family="monospace">{previewSample}</text>
+          <text x="470" y="226" fill="var(--ink-500)" font-size="11">frozen at preview time</text>
+
+          <line x1="0" y1="262" x2="900" y2="262" stroke="var(--rule)" />
+          <text x="0" y="252" fill="var(--ink-900)" font-family="monospace">state</text>
+          <text x="190" y="252" fill="var(--brass-600)" font-family="monospace">draft → consumed</text>
+          <text x="470" y="252" fill="var(--ink-500)" font-size="11">the transition is what makes it single-use</text>
+        </g>
+
+        <!-- the two guarantees -->
+        <g transform="translate(0,286)">
+          <rect x="0" y="0" width="438" height="86" fill="var(--paper)" stroke="var(--rule)" />
+          <text x="16" y="24" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">PERSISTED</text>
+          <text x="16" y="46" fill="var(--ink-700)" font-size="11">Stored in PostgreSQL, not in a Python process.</text>
+          <text x="16" y="62" fill="var(--ink-700)" font-size="11">A confirmation survives a worker restart and</text>
+          <text x="16" y="78" fill="var(--ink-700)" font-size="11">works across workers — the token is not bound</text>
+          <text x="16" y="94" fill="var(--ink-700)" font-size="11">to the one that created it.</text>
+
+          <rect x="462" y="0" width="438" height="86" fill="var(--paper)" stroke="var(--rule)" />
+          <text x="478" y="24" fill="var(--brass-600)" font-size="9.5" font-weight="700" letter-spacing="1.4">SINGLE USE</text>
+          <text x="478" y="46" fill="var(--ink-700)" font-size="11">take() claims the row with a conditional UPDATE.</text>
+          <text x="478" y="62" fill="var(--ink-700)" font-size="11">Two concurrent confirms race on the same row;</text>
+          <text x="478" y="78" fill="var(--ink-700)" font-size="11">exactly one wins, and the other is told the</text>
+          <text x="478" y="94" fill="var(--ink-700)" font-size="11">confirmation expired.</text>
+        </g>
+      </g>
+
+      <!-- ================= footer ================= -->
+      <line x1="0" y1="1096" x2="900" y2="1096" stroke="var(--rule-strong)" />
+      <text x="0" y="1116" fill="var(--ink-500)" font-size="10" letter-spacing="0.6">
+        Field names, risk tiers, the masking rule and the fifteen-minute TTL are read from the source. The values are illustrative.
+      </text>
+      <text x="0" y="1132" fill="var(--ink-500)" font-size="10" letter-spacing="0.6">
+        No live capture exists: no LLM endpoint was available on the capture machine, and none is faked here.
+      </text>
+      <text x="0" y="1152" fill="var(--ink-300)" font-size="9.5" letter-spacing="1.4">
+        PENDING_ACTION_TTL_MINUTES = 15 — THE SAME WINDOW GARBAGE-COLLECTS THE ROW
+      </text>
+    </svg>
+  </div>
+</figure>

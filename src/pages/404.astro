@@ -1,0 +1,54 @@
+import Base from '../layouts/Base.astro';
+import ContactBand from '../components/ContactBand.astro';
+
+const links = [
+  ['/work/imbirt', 'Imbirt case study'],
+  ['/work', 'All work'],
+  ['/about', 'About'],
+  ['/contact', 'Contact'],
+  ['/cv', 'Curriculum vitae'],
+];
+---
+
+<Base
+  title="Page not found | Hayelom Gebrewahid"
+  description="That page does not exist. The Imbirt case study is the one you want."
+  bare
+>
+  <section class="dossier mx-auto w-full max-w-3xl px-4 py-24 sm:px-6">
+    <span class="label text-brass-600">Error 404</span>
+    <h1 class="mt-4 text-[clamp(2.25rem,7vw,4rem)] leading-[1]">
+      That page is not in this dossier.
+    </h1>
+    <p class="mt-5 max-w-prose text-lg text-ink-700">
+      If you followed a printed link and it failed, it is the print that is wrong, not
+      you. Start with the case study — it is the only page that matters here.
+    </p>
+
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a
+        href="/work/imbirt"
+        class="label inline-flex items-center gap-2 bg-ledger-900 px-5 py-3.5 text-bone no-underline transition-colors hover:bg-ledger-700"
+      >
+        Read the Imbirt case study <span aria-hidden="true">→</span>
+      </a>
+      <a
+        href="/"
+        class="label inline-flex items-center gap-2 border border-rule-strong px-5 py-3.5 no-underline transition-colors hover:bg-paper-raised"
+      >
+        Back to the cover
+      </a>
+    </div>
+
+    <ul class="mt-14 border-t border-rule-strong">
+      {links.map(([href, label]) => (
+        <li class="border-b border-rule">
+          <a href={href} class="flex items-baseline justify-between gap-4 py-3.5 no-underline hover:underline">
+            <span class="text-ink-900">{label}</span>
+            <span class="label text-ink-300">{href}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>

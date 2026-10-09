@@ -1,0 +1,290 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import FigurePlate from '../components/FigurePlate.astro';
+import Shot from '../components/Shot.astro';
+import RuleTable from '../components/RuleTable.astro';
+import Stamp from '../components/Stamp.astro';
+import ContactBand from '../components/ContactBand.astro';
+import ArchitectureSection from '../components/ArchitectureSection.astro';
+import figures from '../data/figures.json';
+
+const code = figures.code;
+const tests = figures.tests;
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+
+const work = [
+  {
+    serial: 'CS.01',
+    href: '/work/imbirt',
+    title: 'Imbirt — a multi-tenant ERP on Odoo 19',
+    lede: 'One platform, three industries, one database per tenant. The flagship: what it is, how the control plane works, and how the AI is prevented from damaging your books.',
+    tags: ['Odoo 19', 'PostgreSQL 16', 'Python 3.12', 'Multi-tenancy'],
+    flagship: true,
+  },
+  {
+    serial: 'CS.02',
+    href: '/work/imbirt#ai',
+    title: 'A governed AI assistant that cannot lie about what it did',
+    lede: 'Tool calling with risk tiers, a preview card, and a confirm step. Writes never execute unchecked — the default for every write is to ask.',
+    tags: ['LLM tool calling', 'Governance', 'Safety'],
+  },
+  {
+    serial: 'CS.03',
+    href: '/work/imbirt#property',
+    title: 'Lease life, rent rolls and owner trust accounting',
+    lede: 'Lease contracts that invoice themselves, deposits, utility metering, commissions and owner statements for a real Addis Ababa portfolio.',
+    tags: ['Real estate', 'Accounting', 'Reporting'],
+  },
+  {
+    serial: 'CS.04',
+    href: '/work/imbirt#hospitality',
+    title: 'Front desk to night audit, and a housekeeping gate',
+    lede: 'Reservations, folios, rate plans and night audit — plus checkout-triggered cleaning that cannot be skipped without an inspection.',
+    tags: ['Hospitality', 'Operations', 'POS'],
+  },
+];
+
+const principles = [
+  {
+    n: '01',
+    title: 'Prove it, then claim it',
+    body: 'Every number on this site is generated from the repository by a script. If a figure cannot be re-derived, it does not go on the page.',
+  },
+  {
+    n: '02',
+    title: 'Delete before you add',
+    body: 'Imbirt shipped a 43-file custom access-control engine, then deleted it once native Odoo groups did the job better. Removing code is engineering too.',
+  },
+  {
+    n: '03',
+    title: 'Isolation is architecture, not a promise',
+    body: 'One tenant, one PostgreSQL database, separated by least-privilege roles. Not a WHERE clause somebody has to remember to write.',
+  },
+  {
+    n: '04',
+    title: 'Safe by default, not by permission',
+    body: 'The AI assistant never executes a write the user has not confirmed. Read tools never confirm; medium-risk and above always do.',
+  },
+];
+
+const stack = [
+  ['Platform', 'Odoo 19.0 Community (LGPL)', 'no Enterprise code — verified in the licence review'],
+  ['Language', 'Python 3.12', 'ORM, controllers, scheduled actions, security rules'],
+  ['Database', 'PostgreSQL 16', 'one database per tenant, least-privilege roles'],
+  ['Infrastructure', 'Docker Compose', 'dev profile + hardened production profile'],
+  ['Tenancy', 'Host routing → database resolution', 'server-wide, fails closed on an unknown host'],
+  ['AI', 'Cloud LLM, OpenAI-compatible', 'swappable provider, bring-your-own key'],
+  ['CI', 'GitHub Actions', 'lint matrix + Odoo test matrix on PostgreSQL 16'],
+  ['Frontend', 'OWL / JavaScript / SCSS', 'plus React and Android from earlier work'],
+];
+---
+
+<Base
+  title="Hayelom Gebrewahid — ERP & Platform Engineer, Addis Ababa"
+  description="I designed and built Imbirt, a multi-tenant ERP on Odoo 19 for hospitality, property and trading businesses. Based in Addis Ababa."
+  plate="PL. 01"
+>
+  <!-- ================= PLATE 01 — COVER ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-14 pb-4 sm:px-6 sm:pt-20">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="label text-brass-600">Plate 01 — Dossier cover</span>
+      <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+      <span class="label text-ink-500 tnum">{code.customTrees} custom addons · {code.lines.toLocaleString('en-US')} lines</span>
+    </div>
+
+    <div class="mt-8 grid items-start gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+      <div>
+        <h1 class="text-[clamp(2.5rem,7vw,4.5rem)] leading-[0.95]">
+          I build the operational software businesses actually run&nbsp;on.
+        </h1>
+
+        <p class="mt-6 max-w-prose text-lg text-ink-700 text-pretty">
+          My name is Hayelom Gebrewahid. I designed and built
+          <strong class="font-medium text-ink-900">Imbirt</strong> — a multi-tenant ERP
+          on Odoo 19 Community that provisions a hotel, a property portfolio or a
+          trading business in one action: one database per tenant, an install profile
+          that brings the right modules, and an AI assistant that cannot write
+          anything to your books without asking you first.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a
+            href="/work/imbirt"
+            class="label inline-flex items-center gap-2 bg-ledger-900 px-5 py-3.5 text-bone no-underline transition-colors hover:bg-ledger-700"
+          >
+            Read the Imbirt case study
+            <span aria-hidden="true">→</span>
+          </a>
+          <a
+            href="/contact"
+            class="label inline-flex items-center gap-2 border border-rule-strong px-5 py-3.5 text-ink-900 no-underline transition-colors hover:border-ledger-700 hover:bg-paper-raised"
+          >
+            Start a conversation
+          </a>
+        </div>
+
+        <div class="dim-rule mt-10" aria-hidden="true"></div>
+
+        <dl class="mt-5 grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4">
+          {[
+            ['Custom addons', fmt(code.customTrees)],
+            ['Lines of code', fmt(code.lines)],
+            ['Tests', fmt(tests.functions)],
+            ['Runtime', 'Odoo 19'],
+          ].map(([k, v]) => (
+            <div>
+              <dt class="label text-ink-500">{k}</dt>
+              <dd class="mt-1 font-display text-2xl tnum">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <!-- The first viewport is a thesis: show the artifact, not a portrait. -->
+      <div class="lg:sticky lg:top-20">
+        <Shot
+          file="tenant-ops-tenants.png"
+          plate="FIG. 01"
+          caption="The control plane — every tenant, its package and its state on one screen."
+          measure="1600 × 1000"
+          alt="Imbirt Tenant Operations list showing the tenant registry with package and state columns"
+          priority
+        />
+        <div class="mt-4 flex flex-wrap gap-2">
+          <Stamp tone="ledger">Odoo 19.0 Community</Stamp>
+          <Stamp tone="brass">LGPL-3</Stamp>
+          <Stamp tone="ink">No Enterprise code</Stamp>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= § 01 — THE PLATFORM ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 01"
+      kicker="The platform"
+      title="Three planes, and the boundaries between them are drawn in the architecture."
+      lede="Imbirt is not a set of dashboards bolted onto Odoo. It is a control plane that provisions tenants, a data plane that isolates them, and an application plane that gives each industry the modules it actually needs."
+    />
+
+    <div class="mt-10 max-w-prose text-lg text-ink-700">
+      <p>
+        The tenant operator picks an industry — hospitality, property or business —
+        and one action does the rest: a PostgreSQL database is created and its
+        privileges are separated by role, the package's install profile runs, the
+        owner is granted exactly the native Odoo groups that job needs, and the
+        state flips to <em>Active</em>. If any step fails, the whole provision rolls
+        back. Nothing is half-created.
+      </p>
+      <p class="mt-4">
+        That design decision is the spine of the whole platform: nothing is shared
+        between tenants except the code that provisions them.
+      </p>
+    </div>
+
+    <ArchitectureSection />
+
+    <div class="mt-8 grid gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+      <RuleTable
+        caption="Table 1 — verified counts, generated from ethio-erp-addons by scripts/collect-figures.mjs"
+        rows={[
+          ['Custom addon trees', `${fmt(code.customTrees)}`, `${code.authoredTrees} Imbirt-authored (LGPL-3), 4 modified upstream (AGPL-3)`],
+          ['Source files', fmt(code.files), 'Python, XML, JavaScript, SCSS, CSV'],
+          ['Lines of code', fmt(code.lines), 'custom trees only — vendored upstream excluded'],
+          ['Test files', fmt(tests.files), 'Odoo test suites, run in CI'],
+          ['Test functions', fmt(tests.functions), 'unit + integration coverage'],
+          ['Addon trees on the path', fmt(figures.repo.addonTrees), 'Imbirt custom + curated OCA and third-party'],
+        ]}
+      />
+
+      <div class="border border-rule bg-paper-raised p-6">
+        <p class="label text-ink-500">Largest modules</p>
+        <ol class="mt-4 space-y-3">
+          {figures.modules.slice(0, 6).map((m) => (
+            <li class="flex items-baseline justify-between gap-4 border-b border-rule pb-2.5 last:border-0">
+              <span class="font-mono text-sm text-ink-900">{m.module}</span>
+              <span class="label text-ink-500 tnum">{fmt(m.lines)}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="mt-4 text-xs text-ink-500">
+          Lines across Python, XML, JavaScript and SCSS.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= § 02 — THE WORK ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 02"
+      kicker="The work"
+      title="Four case studies from one platform."
+      lede="They are all the same system viewed from four angles: the platform itself, the AI, the property vertical and the hospitality vertical."
+    />
+
+    <ul class="mt-10 border-t border-rule-strong">
+      {work.map((item) => (
+        <li class="border-b border-rule">
+          <a href={item.href} class="group grid gap-3 py-7 no-underline sm:grid-cols-[5rem_1fr_auto] sm:items-baseline sm:gap-6">
+            <span class="label text-brass-600 tnum">{item.serial}</span>
+            <span>
+              <span class="block font-display text-[1.5rem] leading-tight text-ink-900 group-hover:underline sm:text-[1.75rem]">
+                {item.title}
+                {item.flagship && (
+                  <span class="label ml-3 align-middle text-ledger-500">Flagship</span>
+                )}
+              </span>
+              <span class="mt-2 block max-w-prose text-ink-700">{item.lede}</span>
+              <span class="mt-3 flex flex-wrap gap-1.5">
+                {item.tags.map((t) => (
+                  <span class="label border border-rule px-2 py-1 text-ink-500">{t}</span>
+                ))}
+              </span>
+            </span>
+            <span class="label hidden text-ink-300 transition-colors group-hover:text-brass-600 sm:block">
+              Open →
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- ================= § 03 — HOW I WORK ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 03"
+      kicker="Position"
+      title="Four things I insist on, even when they cost me time."
+      lede="These are not slogans. Each one is a decision visible in the repository history."
+    />
+
+    <div class="mt-10 grid gap-px border border-rule bg-rule sm:grid-cols-2">
+      {principles.map((p) => (
+        <div class="bg-paper p-7">
+          <span class="label text-brass-600 tnum">{p.n}</span>
+          <h3 class="mt-3 text-xl">{p.title}</h3>
+          <p class="mt-2.5 text-ink-700">{p.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ================= § 04 — STACK ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead serial="§ 04" kicker="Stack" title="What I build with." />
+
+    <div class="mt-8 max-w-3xl">
+      <RuleTable
+        caption="Table 2 — the platform I run Imbirt on"
+        rows={stack}
+      />
+    </div>
+  </section>
+
+  <ContactBand />
+</Base>

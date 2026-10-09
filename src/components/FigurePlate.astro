@@ -1,0 +1,44 @@
+---
+interface Props {
+  /**
+   * Extensionless path to the optimised asset, e.g. `/shots/tenant-ops-tenants`.
+   * The plate renders WebP with a JPEG fallback through <picture>.
+   */
+  src: string;
+  /** Plate number, e.g. "FIG. 4.2" */
+  plate: string;
+  caption: string;
+  /** Optional measurement note in the plate's lower-right corner. */
+  measure?: string;
+  alt: string;
+  /** CSS aspect-ratio, so the plate never shifts the page as it loads. */
+  aspect?: string;
+  priority?: boolean;
+}
+
+const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false } = Astro.props;
+---
+
+<figure class="group">
+  <div class="overflow-hidden border border-rule bg-paper-raised shadow-plate" style={`aspect-ratio: ${aspect}`}>
+    <picture>
+      <source srcset={`${src}.webp`} type="image/webp" />
+      <img
+        src={`${src}.jpg`}
+        alt={alt}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding={priority ? 'sync' : 'async'}
+        fetchpriority={priority ? 'high' : 'auto'}
+        class="block h-full w-full object-cover"
+      />
+    </picture>
+  </div>
+
+  <figcaption class="mt-2.5 flex items-baseline justify-between gap-4">
+    <span class="flex items-baseline gap-2.5">
+      <span class="label text-brass-600 tnum">{plate}</span>
+      <span class="text-sm text-ink-700">{caption}</span>
+    </span>
+    {measure && <span class="label hidden shrink-0 text-ink-300 tnum sm:inline">{measure}</span>}
+  </figcaption>
+</figure>

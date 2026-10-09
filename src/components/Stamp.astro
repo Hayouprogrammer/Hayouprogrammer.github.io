@@ -1,0 +1,25 @@
+---
+interface Props {
+  /** Verified fact only. A stamp states something true, never decoration. */
+  children: any;
+  tone?: 'brass' | 'ledger' | 'oxblood' | 'ink';
+  /** Slight rotation, like ink on paper. */
+  tilt?: number;
+}
+
+const { children, tone = 'brass', tilt } = Astro.props;
+
+const tones: Record<string, string> = {
+  brass: 'text-brass-600',
+  ledger: 'text-ledger-500',
+  oxblood: 'text-oxblood',
+  ink: 'text-ink-500',
+};
+---
+
+<span
+  class:list={['stamp', tones[tone]]}
+  style={tilt !== undefined ? `transform: rotate(${tilt}deg)` : undefined}
+>
+  <slot />
+</span>

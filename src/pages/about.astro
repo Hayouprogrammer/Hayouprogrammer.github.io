@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import RuleTable from '../components/RuleTable.astro';
+import ContactBand from '../components/ContactBand.astro';
+import figures from '../data/figures.json';
+import contact from '../data/contact.json';
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+
+const timeline = [
+  ['2026 — now', 'Imbirt', 'Sole designer and engineer. Multi-tenant ERP on Odoo 19 Community for hospitality, property and trading businesses. Wrote the platform, the two verticals, the governed AI assistant and the production Compose profile.'],
+  ['2026', 'All Rights Technologies', 'Intern. Worked on Tereka, a mobile application — Android development in a start-up team, shipping to real users.'],
+  ['2021 — 2026', "St. Mary's University", 'BSc Computer Science. Foundation in data structures, algorithms and databases; final-year work in mobile application development.'],
+];
+---
+
+<Base
+  title="About | Hayelom Gebrewahid"
+  description="Hayelom Gebrewahid — ERP and platform engineer in Addis Ababa. I design and build operational software for African businesses, and I ship the tests and runbooks that keep it alive."
+  plate="PL. 03"
+>
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="label text-brass-600">Plate 03 — About</span>
+      <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+      <span class="label text-ink-500">{contact.principal.location} · {contact.principal.timezone}</span>
+    </div>
+
+    <div class="mt-8 grid gap-14 lg:grid-cols-[1.2fr_0.8fr]">
+      <div>
+        <h1 class="text-[clamp(2.25rem,6vw,3.75rem)] leading-[1]">
+          I like problems where the software has to survive contact with a real business.
+        </h1>
+
+        <div class="mt-8 max-w-prose space-y-4 text-lg text-ink-700">
+          <p>
+            I am a computer science graduate from Addis Ababa who learned more from
+            maintaining one real system than from any course project. That system is
+            Imbirt — an ERP I designed and built on Odoo 19 Community, now running
+            hospitality, property and trading businesses.
+          </p>
+          <p>
+            My bias is toward the boring parts: provisioning that either completes or
+            rolls back, databases that are isolated by role rather than by policy, tests
+            that run in CI on the same PostgreSQL version production uses, and backups
+            somebody has actually restored. When a 43-file custom access-control engine
+            turned out to be worse than the platform's native groups, I deleted it. That
+            decision is in the git history and I would make it again.
+          </p>
+          <p>
+            Outside the platform I work in Python and JavaScript, and I came up through
+            Android development. I read the source of the libraries I depend on, and I
+            write down what I learn — the Imbirt repository carries several hundred
+            kilobytes of audit and design documents for that reason.
+          </p>
+        </div>
+
+        <div class="dim-rule mt-12" aria-hidden="true" />
+
+        <div class="mt-10">
+          <p class="label text-ink-500">Record</p>
+          <ol class="mt-5 space-y-8">
+            {timeline.map(([when, what, body]) => (
+              <li class="grid grid-cols-[7rem_1fr] gap-5">
+                <span class="label pt-1.5 text-brass-600 tnum">{when}</span>
+                <span>
+                  <span class="block font-display text-xl text-ink-900">{what}</span>
+                  <span class="mt-1.5 block text-ink-700">{body}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+
+      <aside class="space-y-10">
+        <div class="border border-rule bg-paper-raised p-6">
+          <p class="label text-ink-500">Capabilities</p>
+          <ul class="mt-4 space-y-2.5 text-sm text-ink-700">
+            {[
+              ['Back-end', 'Python, Odoo ORM, controllers, scheduled actions, security rules'],
+              ['Data', 'PostgreSQL, schema design, migrations, WAL backup and PITR'],
+              ['Front-end', 'JavaScript, OWL, SCSS, React, responsive layout'],
+              ['Mobile', 'Android (Java/Kotlin) from internship and coursework'],
+              ['Infrastructure', 'Docker Compose, reverse proxy, TLS, fail-closed configuration'],
+              ['Practice', 'Test-driven development, CI gates, audit documentation'],
+            ].map(([k, v]) => (
+              <li class="border-b border-rule pb-2.5 last:border-0 last:pb-0">
+                <span class="label block text-ink-900">{k}</span>
+                <span class="mt-1 block">{v}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="border border-rule p-6">
+          <p class="label text-ink-500">Languages</p>
+          <ul class="mt-4 space-y-2 text-sm text-ink-700">
+            <li class="flex justify-between gap-4"><span>Amharic</span><span class="label text-ink-300">Native</span></li>
+            <li class="flex justify-between gap-4"><span>English</span><span class="label text-ink-300">Professional</span></li>
+            <li class="flex justify-between gap-4"><span>Afaan Oromo</span><span class="label text-ink-300">Conversational</span></li>
+            <li class="flex justify-between gap-4"><span>Tigrigna</span><span class="label text-ink-300">Basic</span></li>
+          </ul>
+        </div>
+
+        <RuleTable
+          caption="By the numbers"
+          rows={[
+            ['Custom addons', fmt(figures.code.customTrees)],
+            ['Lines written', fmt(figures.code.lines)],
+            ['Tests', fmt(figures.tests.functions)],
+            ['Addon trees managed', fmt(figures.repo.addonTrees)],
+          ]}
+        />
+      </aside>
+    </div>
+  </section>
+
+  <ContactBand
+    title="Let's talk about your system."
+    primaryLabel="Email me"
+  />
+</Base>

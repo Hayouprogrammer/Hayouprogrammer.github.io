@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HG">
+  <rect width="64" height="64" fill="#0d332d"/>
+  <rect x="3.5" y="3.5" width="57" height="57" fill="none" stroke="#d2a44c" stroke-width="1.5"/>
+  <line x1="3.5" y1="46" x2="60.5" y2="46" stroke="#d2a44c" stroke-width="1" opacity="0.55"/>
+  <text x="32" y="38" text-anchor="middle" font-family="Bodoni Moda, Georgia, serif"
+        font-size="30" fill="#f1eee5">H</text>
+  <text x="32" y="58" text-anchor="middle" font-family="Archivo, system-ui, sans-serif"
+        font-size="8" letter-spacing="1.2" fill="#d2a44c">⬥ G</text>
+</svg>

@@ -1,0 +1,57 @@
+{
+  "$comment": "Single source of truth for published contact channels. EDIT ME: the linkedin url is a placeholder until confirmed by the principal.",
+  "principal": {
+    "name": "Hayelom Gebrewahid",
+    "role": "ERP & Platform Engineer",
+    "location": "Addis Ababa, Ethiopia",
+    "timezone": "GMT+3"
+  },
+  "channels": [
+    {
+      "id": "email",
+      "label": "Email",
+      "value": "hayelomgebrewahid@gmail.com",
+      "href": "mailto:hayelomgebrewahid@gmail.com",
+      "note": "Direct",
+      "confirmed": true
+    },
+    {
+      "id": "telegram",
+      "label": "Telegram",
+      "value": "+251 930 994 308",
+      "href": "https://t.me/+251930994308",
+      "note": "Fastest reply",
+      "confirmed": true
+    },
+    {
+      "id": "whatsapp",
+      "label": "WhatsApp",
+      "value": "+251 930 994 308",
+      "href": "https://wa.me/251930994308",
+      "note": "Fastest reply",
+      "confirmed": true
+    },
+    {
+      "id": "phone",
+      "label": "Phone",
+      "value": "+251 930 994 308",
+      "href": "tel:+251930994308",
+      "note": "Direct",
+      "confirmed": true
+    },
+    {
+      "id": "linkedin",
+      "label": "LinkedIn",
+      "value": "Hayelom Gebrewahid",
+      "href": "https://www.linkedin.com/in/hayelom-gebrewahid/",
+      "note": "Professional",
+      "confirmed": false,
+      "todo": "Confirm the real LinkedIn profile URL before launch."
+    }
+  ],
+  "github": {
+    "handle": "Hayouprogrammer",
+    "href": "https://github.com/Hayouprogrammer",
+    "repo": "https://github.com/Hayouprogrammer/ethio-erp-addons"
+  }
+}

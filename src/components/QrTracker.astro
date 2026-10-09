@@ -1,0 +1,77 @@
+---
+/**
+ * QrTracker — closes the loop between a printed leaflet and a reply.
+ *
+ * A brochure QR carries a UTM-stamped target. This reads it, remembers it for
+ * the session, and stamps it onto every outbound contact link so that when
+ * someone emails or messages, the subject line says which print run they came
+ * from. No analytics vendor, no cookie, no consent banner.
+ */
+---
+
+<script>
+  const KEY = 'hg-attribution';
+
+  type Attribution = { source?: string; medium?: string; campaign?: string };
+
+  const read = (): Attribution => {
+    try {
+      return JSON.parse(sessionStorage.getItem(KEY) ?? '{}');
+    } catch {
+      return {};
+    }
+  };
+
+  const write = (a: Attribution) => {
+    try {
+      sessionStorage.setItem(KEY, JSON.stringify(a));
+    } catch {
+      /* private browsing: attribution is a nicety, never a requirement */
+    }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const fresh: Attribution = {
+    source: params.get('utm_source') ?? undefined,
+    medium: params.get('utm_medium') ?? undefined,
+    campaign: params.get('utm_campaign') ?? undefined,
+  };
+  const hasFresh = Object.values(fresh).some(Boolean);
+
+  if (hasFresh) write({ ...read(), ...fresh });
+  const attribution = hasFresh ? { ...read(), ...fresh } : read();
+
+  const labelled = Object.entries(attribution)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${v}`)
+    .join(', ');
+
+  const stampMailto = () => {
+    if (!labelled) return;
+    const suffix = ` — arrived from ${labelled}`;
+    document.querySelectorAll<HTMLAnchorElement>('a[href^="mailto:"]').forEach((a) => {
+      const [base, query = ''] = a.href.split('?');
+      const q = new URLSearchParams(query);
+      if (!q.get('subject')) q.set('subject', 'Imbirt enquiry');
+      q.set('body', (q.get('body') ?? '') + suffix);
+      a.href = `${base}?${q.toString().replace(/%20/g, '+')}`;
+    });
+    document.querySelectorAll<HTMLAnchorElement>('a[href*="wa.me"], a[href*="t.me"]').forEach((a) => {
+      const [base, query = ''] = a.href.split('?');
+      const q = new URLSearchParams(query);
+      q.set('text', (q.get('text') ?? 'Hello Hayelom') + suffix);
+      a.href = `${base}?${q.toString().replace(/%20/g, '+')}`;
+    });
+  };
+
+  stampMailto();
+
+  // Surface it, quietly, so the visitor knows the leaflet was recognised.
+  if (attribution.source) {
+    const host = document.querySelector('[data-attribution-host]');
+    if (host) {
+      host.textContent = `You arrived from the ${attribution.campaign ?? attribution.source} leaflet.`;
+      host.removeAttribute('hidden');
+    }
+  }
+</script>

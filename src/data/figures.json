@@ -1,0 +1,220 @@
+{
+  "generatedAt": "2026-10-09T19:03:55.051Z",
+  "repo": {
+    "remote": "https://github.com/Hayouprogrammer/ethio-erp-addons.git",
+    "addonTrees": 81
+  },
+  "code": {
+    "customTrees": 27,
+    "authoredTrees": 23,
+    "files": 574,
+    "lines": 80442
+  },
+  "tests": {
+    "files": 119,
+    "functions": 911
+  },
+  "runtime": {
+    "platform": "Odoo 19.0 Community",
+    "language": "Python 3.12",
+    "database": "PostgreSQL 16",
+    "imageTag": "FROM odoo:19",
+    "devWorkers": "--dev=reload",
+    "prodFlags": [
+      "--workers=4",
+      "--proxy-mode",
+      "--no-demo"
+    ]
+  },
+  "modules": [
+    {
+      "module": "imbirt_tenant_ops",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 76,
+      "lines": 21626
+    },
+    {
+      "module": "imbirt_ai",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 29,
+      "lines": 16983
+    },
+    {
+      "module": "imbirt_social",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 36,
+      "lines": 8506
+    },
+    {
+      "module": "imbirt_lease",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 42,
+      "lines": 5148
+    },
+    {
+      "module": "pms_sale",
+      "authored": false,
+      "licence": "AGPL-3.0 (modified upstream)",
+      "files": 55,
+      "lines": 3762
+    },
+    {
+      "module": "pms_base",
+      "authored": false,
+      "licence": "AGPL-3.0 (modified upstream)",
+      "files": 49,
+      "lines": 3056
+    },
+    {
+      "module": "hms_imbirt",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 29,
+      "lines": 2680
+    },
+    {
+      "module": "pms_owner_account",
+      "authored": false,
+      "licence": "AGPL-3.0 (modified upstream)",
+      "files": 23,
+      "lines": 2338
+    },
+    {
+      "module": "imbirt_menu_policy",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 16,
+      "lines": 2099
+    },
+    {
+      "module": "imbirt_tenant_client",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 19,
+      "lines": 2034
+    },
+    {
+      "module": "imbirt_dashboard",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 11,
+      "lines": 1501
+    },
+    {
+      "module": "workflow_engine",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 21,
+      "lines": 1425
+    },
+    {
+      "module": "imbirt_brand",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 28,
+      "lines": 1403
+    },
+    {
+      "module": "imbirt_hotel",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 20,
+      "lines": 1335
+    },
+    {
+      "module": "imbirt_housekeeping",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 16,
+      "lines": 1008
+    },
+    {
+      "module": "imbirt_reporting",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 14,
+      "lines": 838
+    },
+    {
+      "module": "imbirt_property_ui",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 9,
+      "lines": 692
+    },
+    {
+      "module": "pms_account",
+      "authored": false,
+      "licence": "AGPL-3.0 (modified upstream)",
+      "files": 15,
+      "lines": 687
+    },
+    {
+      "module": "imbirt_tenant_home",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 11,
+      "lines": 672
+    },
+    {
+      "module": "imbirt_sale",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 13,
+      "lines": 666
+    },
+    {
+      "module": "imbirt_tenant_lockdown",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 10,
+      "lines": 535
+    },
+    {
+      "module": "imbirt_routing",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 5,
+      "lines": 385
+    },
+    {
+      "module": "imbirt_ops",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 7,
+      "lines": 367
+    },
+    {
+      "module": "imbirt_pos_debrand",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 7,
+      "lines": 283
+    },
+    {
+      "module": "imbirt_ui_fixes",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 4,
+      "lines": 206
+    },
+    {
+      "module": "imbirt_brand_website",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 4,
+      "lines": 106
+    },
+    {
+      "module": "imbirt_dashboard_spreadsheet",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 5,
+      "lines": 101
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.impeccable/
+.astro/
+public/screens/.chatter-*.json
+public/screens/.provisioned-*.png
+*.log
+.DS_Store

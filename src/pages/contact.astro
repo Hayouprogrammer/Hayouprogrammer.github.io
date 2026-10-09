@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Stamp from '../components/Stamp.astro';
+import contact from '../data/contact.json';
+import figures from '../data/figures.json';
+
+const primary = contact.channels[0];
+const others = contact.channels.slice(1);
+---
+
+<Base
+  title="Contact | Hayelom Gebrewahid"
+  description="Get in touch about an ERP system for your hotel, property portfolio or business. Based in Addis Ababa, replies the same day on Telegram and WhatsApp."
+  plate="PL. 04"
+>
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="label text-brass-600">Plate 04 — Contact</span>
+      <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+      <span class="label text-ink-500">{contact.principal.location} · {contact.principal.timezone}</span>
+    </div>
+
+    <div class="mt-8 grid gap-14 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <h1 class="text-[clamp(2.25rem,6vw,3.75rem)] leading-[1]">
+          Tell me what your business is trying to run on.
+        </h1>
+
+        <p class="mt-6 max-w-prose text-lg text-ink-700 text-pretty">
+          The most useful first message is a short one: what you do, how many rooms or
+          units or people, and what is currently costing you time. If Imbirt is not the
+          right answer I will say so and tell you what would be.
+        </p>
+
+        <div class="mt-9">
+          <p class="label text-ink-500">Fastest route</p>
+          <a
+            href={primary.href}
+            class="mt-3 inline-block break-all font-display text-[clamp(1.25rem,5.5vw,1.875rem)] leading-tight text-ink-900 no-underline hover:underline"
+          >
+            {primary.value}
+            <span class="text-brass-600" aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="mt-10 flex flex-wrap gap-2">
+          <Stamp tone="ledger">Replies same day</Stamp>
+          <Stamp tone="brass">GMT+3</Stamp>
+          <Stamp tone="ink">English &amp; Amharic</Stamp>
+        </div>
+
+        <div class="mt-10 border-t border-rule pt-8">
+          <p class="label text-ink-500">If you arrived by brochure</p>
+          <p data-attribution-host hidden class="mt-2 max-w-prose text-ink-700"></p>
+          <p class="mt-2 max-w-prose text-ink-700">
+            The code on the leaflet points at the Imbirt case study —
+            <a href="/work/imbirt" class="font-mono text-base">/work/imbirt</a>. If the
+            link failed or the print is smudged, this page always works. Tell me where
+            you picked up the brochure and I will send you the same material directly.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <table class="w-full border-collapse text-left text-sm">
+          <caption class="label mb-3 text-left text-ink-500">Every channel</caption>
+          <tbody>
+            {others.map((c) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="w-24 py-3.5 pr-4 align-top font-normal text-ink-500">{c.label}</th>
+                <td class="py-3.5 align-top">
+                  <a href={c.href} class="font-medium text-ink-900 no-underline hover:underline">
+                    {c.value}
+                  </a>
+                  <span class="label ml-2 text-ink-300">{c.note}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div class="mt-8 border border-rule bg-paper-raised p-6">
+          <p class="label text-ink-500">What I am available for</p>
+          <ul class="mt-4 space-y-2.5 text-sm text-ink-700">
+            <li class="flex gap-3"><span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span><span>Deploying and running Imbirt for a hotel, landlord or trading business in Ethiopia</span></li>
+            <li class="flex gap-3"><span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span><span>Odoo customisation and vertical development</span></li>
+            <li class="flex gap-3"><span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span><span>Platform and back-end engineering work, remote or in Addis</span></li>
+            <li class="flex gap-3"><span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span><span>Android and full-stack delivery</span></li>
+          </ul>
+        </div>
+
+        <div class="mt-8 text-sm text-ink-500">
+          <p>
+            Repository: <a href={contact.github.repo} class="font-mono">Hayouprogrammer/ethio-erp-addons</a> —
+            {figures.code.customTrees} custom addons, {figures.code.lines.toLocaleString('en-US')} lines.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

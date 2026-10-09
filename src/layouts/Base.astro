@@ -1,0 +1,69 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Short serial shown in the masthead, e.g. "PL. 01". */
+  plate?: string;
+  /** Hide the site masthead and footer (used on the print CV). */
+  bare?: boolean;
+  /** Prevents a page indexing itself — for the thin redirect route. */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  plate,
+  bare = false,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(
+  Astro.url.pathname,
+  Astro.site ?? 'https://hayelom.pages.dev',
+).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Theme resolution before first paint: no flash of the wrong sheet. -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('hg-theme');
+          var dark = stored
+            ? stored === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body class="min-h-screen">
+    {!bare && <SiteHeader plate={plate} />}
+    <slot />
+    {!bare && <SiteFooter />}
+  </body>
+</html>

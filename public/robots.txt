@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /imbirt
+
+Sitemap: https://hayelom.pages.dev/sitemap.xml

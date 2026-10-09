@@ -1,0 +1,44 @@
+---
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import FigurePlate from './FigurePlate.astro';
+
+interface Props {
+  /** File name under public/screens/, e.g. "tenant-ops-tenants.png" */
+  file: string;
+  plate: string;
+  caption: string;
+  measure?: string;
+  alt: string;
+  aspect?: string;
+  priority?: boolean;
+}
+
+const { file, plate, caption, measure, alt, aspect, priority = false } = Astro.props;
+
+const publicRoot = fileURLToPath(new URL('../../public', import.meta.url));
+const captured = existsSync(`${publicRoot}/screens/${file}`);
+const optimised = existsSync(`${publicRoot}/shots/${file.replace(/\.[^.]+$/, '.webp')}`);
+const stem = `/shots/${file.replace(/\.[^.]+$/, '')}`;
+---
+
+{captured && optimised ? (
+  <FigurePlate
+    src={stem}
+    plate={plate}
+    caption={caption}
+    measure={measure}
+    alt={alt}
+    aspect={aspect}
+    priority={priority}
+  />
+) : (
+  <figure class="border border-dashed border-rule-strong bg-paper-raised p-8">
+    <div class="flex items-baseline justify-between gap-4">
+      <span class="label text-brass-600 tnum">{plate}</span>
+      <span class="label text-oxblood">{captured ? 'Not optimised' : 'Not captured'}</span>
+    </div>
+    <p class="mt-3 text-sm text-ink-700">{caption}</p>
+    <p class="mt-1 font-mono text-xs text-ink-500">public/screens/{file}</p>
+  </figure>
+)}

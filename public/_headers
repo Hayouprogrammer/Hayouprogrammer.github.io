@@ -1,0 +1,49 @@
+/*
+  Security + cache headers for Cloudflare Pages.
+  https://developers.cloudflare.com/pages/configuration/headers/
+*/
+
+/*
+  Global security headers. A portfolio has no user input and no cookies,
+  so a strict CSP is cheap and it is a real quality signal on the page.
+*/
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self'; upgrade-insecure-requests
+*/
+
+# Long-cache the build output — Astro fingerprints every asset in /_astro/.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Self-hosted fonts are immutable too.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Screenshots: long cache, still revalidated on redeploy.
+/screens/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# Never cache the entry documents — a QR scanner must always get current copy.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/work/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+# Print assets: immutable once issued.
+/qr/*
+  Cache-Control: public, max-age=31536000, immutable

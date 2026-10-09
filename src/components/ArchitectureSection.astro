@@ -1,0 +1,147 @@
+---
+/**
+ * ArchitectureSection — the platform drawn as a dimensioned building section.
+ * Every plane, label and dimension reflects the real module graph in
+ * ethio-erp-addons; it is a figure, not decoration.
+ */
+---
+
+<figure class="my-10">
+  <div class="border border-rule bg-paper-raised p-4 shadow-plate sm:p-6">
+    <svg
+      viewBox="0 0 900 470"
+      role="img"
+      aria-labelledby="arch-title arch-desc"
+      class="block h-auto w-full"
+      font-family="var(--font-body)"
+    >
+      <title id="arch-title">Imbirt platform section: control plane, data plane, application plane</title>
+      <desc id="arch-desc">
+        Three horizontal planes. The control plane holds tenant registry,
+        provisioning, lifecycle and metering. The data plane is one PostgreSQL
+        database per tenant, separated by least-privilege roles. The
+        application plane holds the hospitality, property and business
+        packages plus the governed AI assistant.
+      </desc>
+
+      <!-- ---- dimension gutter ---- -->
+      <g stroke="var(--rule-strong)" stroke-width="1">
+        <line x1="34" y1="46" x2="34" y2="404" />
+        <line x1="29" y1="46" x2="39" y2="46" />
+        <line x1="29" y1="404" x2="39" y2="404" />
+      </g>
+      <text x="22" y="230" fill="var(--ink-500)" font-size="10" letter-spacing="1.6"
+            text-anchor="middle" transform="rotate(-90 22 230)">PLATFORM SECTION</text>
+
+      <!-- ---- PLANE 1: control ---- -->
+      <g>
+        <rect x="60" y="46" width="820" height="102" fill="var(--ledger-900)" opacity="0.06" />
+        <line x1="60" y1="46" x2="880" y2="46" stroke="var(--rule-strong)" stroke-width="1.5" />
+        <line x1="60" y1="148" x2="880" y2="148" stroke="var(--rule)" stroke-width="1" stroke-dasharray="4 4" />
+        <text x="76" y="70" fill="var(--brass-600)" font-size="10" font-weight="700" letter-spacing="1.8">PLANE 01 — CONTROL</text>
+        <text x="76" y="94" fill="var(--ink-900)" font-size="19" font-weight="600">Tenant Operations</text>
+        <text x="76" y="116" fill="var(--ink-500)" font-size="11.5">Registry · provisioning · lifecycle · metering · package roles</text>
+
+        <!-- control chips -->
+        <g font-size="10.5" fill="var(--ink-700)">
+          <g transform="translate(620,62)">
+            <rect width="248" height="24" fill="var(--paper-raised)" stroke="var(--rule)" />
+            <text x="10" y="16" >host → tenant-database resolution</text>
+          </g>
+          <g transform="translate(620,94)">
+            <rect width="248" height="24" fill="var(--paper-raised)" stroke="var(--rule)" />
+            <text x="10" y="16">native Odoo groups, per package</text>
+          </g>
+        </g>
+      </g>
+
+      <!-- ---- PLANE 2: data ---- -->
+      <g>
+        <rect x="60" y="162" width="820" height="102" fill="var(--ledger-700)" opacity="0.07" />
+        <line x1="60" y1="162" x2="880" y2="162" stroke="var(--rule-strong)" stroke-width="1.5" />
+        <line x1="60" y1="264" x2="880" y2="264" stroke="var(--rule)" stroke-width="1" stroke-dasharray="4 4" />
+        <text x="76" y="186" fill="var(--brass-600)" font-size="10" font-weight="700" letter-spacing="1.8">PLANE 02 — DATA</text>
+        <text x="76" y="210" fill="var(--ink-900)" font-size="19" font-weight="600">One database per tenant</text>
+        <text x="76" y="232" fill="var(--ink-500)" font-size="11.5">Isolation by construction, separated by PostgreSQL least-privilege roles</text>
+
+        <!-- db cylinders -->
+        <g transform="translate(620,168)">
+          <g>
+            <ellipse cx="24" cy="10" rx="24" ry="8" fill="var(--paper-raised)" stroke="var(--rule-strong)" />
+            <path d="M0 10 v26 a24 8 0 0 0 48 0 V10" fill="var(--paper-raised)" stroke="var(--rule-strong)" />
+            <text x="58" y="16" fill="var(--ink-700)" font-size="10.5">t_skyline_hotel</text>
+            <text x="58" y="30" fill="var(--ink-300)" font-size="9.5">hospitality package</text>
+          </g>
+          <g transform="translate(0,44)">
+            <ellipse cx="24" cy="10" rx="24" ry="8" fill="var(--paper-raised)" stroke="var(--rule-strong)" />
+            <path d="M0 10 v26 a24 8 0 0 0 48 0 V10" fill="var(--paper-raised)" stroke="var(--rule-strong)" />
+            <text x="58" y="16" fill="var(--ink-700)" font-size="10.5">t_riverside_properties</text>
+            <text x="58" y="30" fill="var(--ink-300)" font-size="9.5">property package</text>
+          </g>
+        </g>
+      </g>
+
+      <!-- ---- PLANE 3: application ---- -->
+      <g>
+        <rect x="60" y="278" width="820" height="126" fill="var(--brass-600)" opacity="0.05" />
+        <line x1="60" y1="278" x2="880" y2="278" stroke="var(--rule-strong)" stroke-width="1.5" />
+        <line x1="60" y1="404" x2="880" y2="404" stroke="var(--rule-strong)" stroke-width="1.5" />
+        <text x="76" y="302" fill="var(--brass-600)" font-size="10" font-weight="700" letter-spacing="1.8">PLANE 03 — APPLICATION</text>
+
+        <g font-size="10.5" fill="var(--ink-700)">
+          <g transform="translate(76,318)">
+            <rect width="150" height="66" fill="var(--paper-raised)" stroke="var(--rule)" />
+            <text x="10" y="20" font-size="12" font-weight="600" fill="var(--ink-900)">Hospitality</text>
+            <text x="10" y="36" fill="var(--ink-500)" font-size="9.5">front desk · folios</text>
+            <text x="10" y="49" fill="var(--ink-500)" font-size="9.5">night audit · housekeeping</text>
+          </g>
+          <g transform="translate(238,318)">
+            <rect width="150" height="66" fill="var(--paper-raised)" stroke="var(--rule)" />
+            <text x="10" y="20" font-size="12" font-weight="600" fill="var(--ink-900)">Property</text>
+            <text x="10" y="36" fill="var(--ink-500)" font-size="9.5">leases · rent schedules</text>
+            <text x="10" y="49" fill="var(--ink-500)" font-size="9.5">owner trust accounting</text>
+          </g>
+          <g transform="translate(400,318)">
+            <rect width="150" height="66" fill="var(--paper-raised)" stroke="var(--rule)" />
+            <text x="10" y="20" font-size="12" font-weight="600" fill="var(--ink-900)">Business</text>
+            <text x="10" y="36" fill="var(--ink-500)" font-size="9.5">accounting · HR · POS</text>
+            <text x="10" y="49" fill="var(--ink-500)" font-size="9.5">approvals · reporting</text>
+          </g>
+          <g transform="translate(562,318)">
+            <rect width="150" height="66" fill="var(--brass-200)" stroke="var(--brass-600)" />
+            <text x="10" y="20" font-size="12" font-weight="600" fill="var(--ink-900)">AI assistant</text>
+            <text x="10" y="36" fill="var(--ink-700)" font-size="9.5">preview → confirm</text>
+            <text x="10" y="49" fill="var(--ink-700)" font-size="9.5">→ execute</text>
+          </g>
+          <g transform="translate(724,318)">
+            <rect width="156" height="66" fill="var(--paper-raised)" stroke="var(--rule)" />
+            <text x="10" y="20" font-size="12" font-weight="600" fill="var(--ink-900)">Shared shell</text>
+            <text x="10" y="36" fill="var(--ink-500)" font-size="9.5">menus · branding</text>
+            <text x="10" y="49" fill="var(--ink-500)" font-size="9.5">routing · lockdown</text>
+          </g>
+        </g>
+      </g>
+
+      <!-- ---- connectors ---- -->
+      <g stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3">
+        <line x1="744" y1="148" x2="744" y2="162" />
+        <line x1="744" y1="264" x2="744" y2="278" />
+      </g>
+      <g fill="var(--rule-strong)">
+        <path d="M741 162 l3 -5 l3 5 z" />
+        <path d="M741 278 l3 -5 l3 5 z" />
+      </g>
+
+      <!-- ---- footer rule + scale ---- -->
+      <line x1="60" y1="428" x2="880" y2="428" stroke="var(--rule)" />
+      <g stroke="var(--rule-strong)" stroke-width="1">
+        <line x1="60" y1="424" x2="60" y2="432" />
+        <line x1="60" y1="428" x2="880" y2="428" />
+        <line x1="880" y1="424" x2="880" y2="432" />
+      </g>
+      <text x="470" y="452" fill="var(--ink-300)" font-size="9.5" letter-spacing="1.4" text-anchor="middle">
+        DRAWN FROM THE MODULE GRAPH — ethio-erp-addons/addons
+      </text>
+    </svg>
+  </div>
+</figure>

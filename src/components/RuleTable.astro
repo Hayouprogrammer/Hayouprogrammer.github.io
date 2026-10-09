@@ -1,0 +1,33 @@
+---
+interface Props {
+  caption?: string;
+  /** Rows are [label, value, optional note]. */
+  rows: Array<[string, string, string?]>;
+}
+
+const { caption, rows } = Astro.props;
+---
+
+<div class="overflow-x-auto">
+  <table class="w-full min-w-[22rem] border-collapse text-left text-sm">
+    {caption && (
+      <caption class="label mb-2 text-left text-ink-500">{caption}</caption>
+    )}
+    <thead>
+      <tr class="border-b border-rule-strong">
+        <th scope="col" class="label py-2 pr-4 font-semibold text-ink-500">Entry</th>
+        <th scope="col" class="label py-2 pr-4 font-semibold text-ink-500">Value</th>
+        <th scope="col" class="label hidden py-2 font-semibold text-ink-500 sm:table-cell">Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value, note]) => (
+        <tr class="border-b border-rule">
+          <th scope="row" class="py-2.5 pr-4 align-top font-normal text-ink-700">{label}</th>
+          <td class="py-2.5 pr-4 align-top font-medium text-ink-900">{value}</td>
+          <td class="hidden py-2.5 align-top text-ink-500 sm:table-cell">{note ?? ''}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

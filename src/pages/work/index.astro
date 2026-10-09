@@ -1,0 +1,77 @@
+---
+import Base from '../../layouts/Base.astro';
+import SectionHead from '../../components/SectionHead.astro';
+
+const studies = [
+  {
+    serial: 'CS.01',
+    href: '/work/imbirt',
+    title: 'Imbirt — a multi-tenant ERP on Odoo 19',
+    lede: 'The flagship. One platform that provisions a hotel, a property portfolio or a trading business in one action, with one PostgreSQL database per tenant and an AI assistant that cannot write without asking.',
+    tags: ['Odoo 19', 'PostgreSQL 16', 'Multi-tenancy', 'Governed AI'],
+    flagship: true,
+  },
+  {
+    serial: 'CS.02',
+    href: '/work/imbirt#ai',
+    title: 'The governed AI assistant',
+    lede: 'Tool calling with risk tiers, a preview card and a confirm step. Writes never execute unchecked — read tools never confirm, medium-risk and above always do.',
+    tags: ['LLM tool calling', 'Governance', 'Safety'],
+  },
+  {
+    serial: 'CS.03',
+    href: '/work/imbirt#property',
+    title: 'Lease life, rent rolls and owner trust accounting',
+    lede: 'Lease contracts that invoice themselves, deposits, utility metering, commissions and owner statements that reconcile to the ledger.',
+    tags: ['Real estate', 'Accounting', 'Reporting'],
+  },
+  {
+    serial: 'CS.04',
+    href: '/work/imbirt#hospitality',
+    title: 'Front desk to night audit, and a housekeeping gate',
+    lede: 'Reservations, folios, rate plans and night audit — plus checkout-triggered cleaning that cannot be skipped without an inspection.',
+    tags: ['Hospitality', 'Operations', 'POS'],
+  },
+];
+---
+
+<Base
+  title="Work | Hayelom Gebrewahid"
+  description="Case studies from Imbirt, a multi-tenant ERP built on Odoo 19 for hospitality, property and trading businesses."
+  plate="PL. 02"
+>
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="label text-brass-600">Plate 02 — Index of work</span>
+      <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+      <span class="label text-ink-500">{studies.length} entries</span>
+    </div>
+
+    <SectionHead
+      title="All the work is one system."
+      lede="These four entries are the same platform viewed from four angles. Read the flagship first — the others sit inside it."
+    />
+
+    <ul class="mt-12 border-t border-rule-strong">
+      {studies.map((s) => (
+        <li class="border-b border-rule">
+          <a href={s.href} class="group grid gap-3 py-8 no-underline sm:grid-cols-[5rem_1fr] sm:gap-6">
+            <span class="label text-brass-600 tnum">{s.serial}</span>
+            <span>
+              <span class="block font-display text-[1.625rem] leading-tight text-ink-900 group-hover:underline sm:text-[2rem]">
+                {s.title}
+                {s.flagship && <span class="label ml-3 align-middle text-ledger-500">Flagship</span>}
+              </span>
+              <span class="mt-2 block max-w-prose text-lg text-ink-700">{s.lede}</span>
+              <span class="mt-4 flex flex-wrap gap-1.5">
+                {s.tags.map((t) => (
+                  <span class="label border border-rule px-2 py-1 text-ink-500">{t}</span>
+                ))}
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>

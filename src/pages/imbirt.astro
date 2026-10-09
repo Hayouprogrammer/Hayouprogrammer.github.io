@@ -1,0 +1,26 @@
+---
+/**
+ * /imbirt — the printed QR target.
+ *
+ * Short, typeable, and stable: the case study can be reorganised without
+ * breaking a single printed brochure. On Cloudflare Pages the real 301 is
+ * served from public/_redirects; this page is the portable fallback for hosts
+ * that only serve static files.
+ */
+return Astro.redirect('/work/imbirt', 301);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, follow" />
+    <meta http-equiv="refresh" content="0; url=/work/imbirt" />
+    <title>Imbirt — case study</title>
+  </head>
+  <body>
+    <p>
+      Redirecting to the
+      <a href="/work/imbirt">Imbirt case study</a>.
+    </p>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+---
+interface Props {
+  plate?: string;
+}
+
+const { plate } = Astro.props;
+
+import ThemeToggle from './ThemeToggle.astro';
+
+const nav = [
+  { href: '/work', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const isActive = (href: string) => Astro.url.pathname.startsWith(href);
+---
+
+<header class="no-print sticky top-0 z-40 border-b border-rule bg-paper/92 backdrop-blur-sm">
+  <div class="dossier mx-auto w-full max-w-6xl px-4 sm:px-6">
+
+    <!-- Phone: two rows so the name never truncates and the nav never crowds it. -->
+    <div class="flex h-auto flex-col gap-2 py-2.5 sm:hidden">
+      <div class="flex items-center justify-between gap-3">
+        <a href="/" class="flex items-baseline gap-2.5 no-underline">
+          <span class="font-display text-[0.9375rem] leading-none tracking-tight">
+            Hayelom&nbsp;Gebrewahid
+          </span>
+        </a>
+        <ThemeToggle />
+      </div>
+      <nav aria-label="Sections" class="flex items-center">
+        {nav.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'label px-2.5 py-1 no-underline transition-colors first:pl-0',
+              isActive(item.href) ? 'text-ink-900' : 'text-ink-500 hover:text-ink-900',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+
+    <!-- sm and up: one row, the masthead lockup on the left. -->
+    <div class="hidden h-14 items-center justify-between gap-3 sm:flex">
+      <a href="/" class="flex items-baseline gap-2.5 no-underline">
+        <span class="font-display text-[1.0625rem] leading-none tracking-tight">
+          Hayelom&nbsp;Gebrewahid
+        </span>
+        <span class="hidden text-ink-300 lg:inline" aria-hidden="true">/</span>
+        <span class="label hidden text-ink-500 lg:inline">ERP&nbsp;&amp;&nbsp;Platform&nbsp;Engineering</span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        {plate && <span class="label hidden text-brass-600 md:inline tnum">{plate}</span>}
+        <nav aria-label="Sections" class="flex items-center">
+          {nav.map((item) => (
+            <a
+              href={item.href}
+              class:list={[
+                'label px-2.5 py-2 no-underline transition-colors',
+                isActive(item.href) ? 'text-ink-900' : 'text-ink-500 hover:text-ink-900',
+              ]}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <span class="mx-1 h-4 w-px bg-rule" aria-hidden="true"></span>
+        <ThemeToggle />
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+
+  const sync = () => {
+    const dark = root.classList.contains('dark');
+    document
+      .querySelectorAll<HTMLElement>('.theme-label-light')
+      .forEach((el) => el.classList.toggle('hidden', dark));
+    document
+      .querySelectorAll<HTMLElement>('.theme-label-dark')
+      .forEach((el) => el.classList.toggle('hidden', !dark));
+    document
+      .querySelectorAll<HTMLElement>('#theme-toggle')
+      .forEach((el) => el.setAttribute('aria-pressed', String(dark)));
+  };
+
+  sync();
+  document.querySelectorAll('#theme-toggle').forEach((button) => {
+    button.addEventListener('click', () => {
+      const dark = root.classList.toggle('dark');
+      try {
+        localStorage.setItem('hg-theme', dark ? 'dark' : 'light');
+      } catch (e) {
+        /* private browsing: the toggle still works, it just will not persist */
+      }
+      sync();
+    });
+  });
+</script>

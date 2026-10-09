@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # The site must be served to be audited; preview it behind a port.
+      - name: Preview
+        run: |
+          npx astro preview --port 4321 --host 127.0.0.1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4321/ >/dev/null && break
+            sleep 1
+          done
+
+      - name: Accessibility, overflow and console gate
+        run: node scripts/audit.mjs --quick
+
+      - name: Contrast gate
+        run: node scripts/contrast.mjs
+
+      - name: QR payload gate
+        run: |
+          node scripts/make-qr.mjs
+          node scripts/verify-qr.mjs
+
+      - name: Upload review captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: review
+          path: .impeccable/review/
+          retention-days: 7

@@ -1,0 +1,36 @@
+{
+  "name": "hayelom-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio and Imbirt case study for Hayelom Gebrewahid - ERP and platform engineer, Addis Ababa.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/prune-dist.mjs",
+    "preview": "astro preview",
+    "check": "astro check",
+    "capture": "node scripts/capture-screens.mjs",
+    "images": "node scripts/optimize-images.mjs",
+    "qr": "node scripts/make-qr.mjs",
+    "verify-qr": "node scripts/verify-qr.mjs",
+    "figures": "node scripts/collect-figures.mjs",
+    "audit": "node scripts/audit.mjs",
+    "gate": "npm run build && node scripts/verify-qr.mjs && node scripts/contrast.mjs && node scripts/audit.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.2.5",
+    "@fontsource/bodoni-moda": "^5.2.5",
+    "@fontsource/noto-sans-ethiopic": "^5.2.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "astro": "^5.14.1",
+    "axe-core": "^4.10.0",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
+    "playwright": "^1.49.0",
+    "qrcode": "^1.5.4",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3"
+  }
+}

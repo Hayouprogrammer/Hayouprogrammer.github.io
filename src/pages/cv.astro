@@ -1,0 +1,171 @@
+---
+import Base from '../layouts/Base.astro';
+import contact from '../data/contact.json';
+import figures from '../data/figures.json';
+
+const email = contact.channels.find((c) => c.id === 'email');
+const phone = contact.channels.find((c) => c.id === 'phone');
+const linkedin = contact.channels.find((c) => c.id === 'linkedin');
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+
+const skills: Array<[string, string]> = [
+  ['Languages', 'Python, JavaScript (ES6+), Java, basic C++'],
+  ['Frameworks & platforms', 'Odoo 19 (ORM, controllers, cron, security rules), Android, React'],
+  ['Data', 'PostgreSQL, schema design, migrations, WAL archive and point-in-time recovery'],
+  ['Web', 'HTML, CSS / SCSS, OWL, responsive and accessible layout'],
+  ['Tooling', 'Git, Docker Compose, GitHub Actions, Ruff, pytest'],
+  ['Practice', 'Test-driven development, audit documentation, least-privilege configuration'],
+];
+
+const languages: Array<[string, string]> = [
+  ['Amharic', 'Native'],
+  ['English', 'Professional working proficiency'],
+  ['Afaan Oromo', 'Conversational'],
+  ['Tigrigna', 'Basic'],
+];
+---
+
+<Base
+  title="Curriculum vitae — Hayelom Gebrewahid"
+  description="Curriculum vitae for Hayelom Gebrewahid, ERP and platform engineer in Addis Ababa. Print or save as PDF from this page."
+  bare
+>
+  <div class="mx-auto max-w-[210mm] px-4 py-10 sm:px-0">
+    <!-- Screen-only toolbar -->
+    <div class="no-print mb-8 flex flex-wrap items-center justify-between gap-3 border border-rule bg-paper-raised px-4 py-3">
+      <p class="label text-ink-500">Print · Save as PDF · A4</p>
+      <div class="flex gap-2">
+        <button
+          id="cv-print"
+          class="label bg-ledger-900 px-4 py-2 text-bone transition-colors hover:bg-ledger-700"
+        >
+          Print this page
+        </button>
+        <a href="/work/imbirt" class="label border border-rule px-4 py-2 no-underline hover:bg-paper">
+          Read the case study
+        </a>
+      </div>
+    </div>
+
+    <article class="bg-paper px-0 py-0 text-[10.5pt] leading-[1.45] sm:px-10 sm:py-10">
+      <!-- Masthead -->
+      <header class="border-b-[1.5pt] border-ink-900 pb-4">
+        <h1 class="font-display text-[30pt] leading-none">Hayelom Gebrewahid</h1>
+        <p class="mt-2 text-[11pt] font-medium tracking-wide text-ink-700">
+          ERP &amp; Platform Engineer · {contact.principal.location}
+        </p>
+        <p class="mt-2 text-[9.5pt] text-ink-500">
+          {email?.value} · {phone?.value} · {linkedin?.value} · {contact.github.handle}
+        </p>
+      </header>
+
+      <section class="mt-6">
+        <h2 class="label border-b border-rule pb-1 text-ink-500">Profile</h2>
+        <p class="mt-2.5">
+          Computer science graduate and platform engineer who designed and built
+          <strong>Imbirt</strong>, a multi-tenant ERP on Odoo 19 Community serving
+          hospitality, property and trading businesses — {fmt(figures.code.customTrees)} custom
+          addons, {fmt(figures.code.lines)} lines and {fmt(figures.tests.functions)} test functions.
+          Comfortable across the stack: database schema and least-privilege roles, Odoo
+          back-end, JavaScript front-end, Android, and the Docker and CI configuration that
+          keeps a production system alive. Interested in operational software for African
+          businesses and in platform work where isolation, rollback and observability are the
+          product.
+        </p>
+      </section>
+
+      <section class="mt-6">
+        <h2 class="label border-b border-rule pb-1 text-ink-500">Experience</h2>
+
+        <div class="mt-3">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="font-display text-[13pt]">Sole Designer &amp; Engineer — Imbirt</h3>
+            <span class="label text-ink-500">Oct 2026 — present · Addis Ababa</span>
+          </div>
+          <ul class="mt-2 list-disc space-y-1 pl-4">
+            <li>Designed and built a multi-tenant ERP on Odoo 19.0 Community: one PostgreSQL database per tenant, separated by least-privilege roles, with host-to-database routing that fails closed on an unknown host.</li>
+            <li>Built the control plane — tenant registry, one-action provisioning with whole-provision rollback, lifecycle (suspend / reactivate / archive / export), plan metering and an ops watchdog over critical scheduled jobs.</li>
+            <li>Designed the governed AI assistant: risk-tiered tool calling in which read tools never confirm and every write requires an explicit preview-and-confirm step.</li>
+            <li>Delivered the hospitality vertical (reservations, folios, night audit, checkout-triggered housekeeping with inspection gating, white-labelled POS) and the property vertical (lease life, rent schedules, owner trust accounting, rent roll and delinquency reporting).</li>
+            <li>Removed a bespoke 43-file access-control engine in favour of native Odoo groups, reimplementing only what was unique; maintained licence provenance and a CycloneDX SBOM across {fmt(figures.repo.addonTrees)} addon trees with no Enterprise code.</li>
+            <li>Hardened the production Docker Compose profile (loopback-only bind, unpublished database port, read-only addons, proxy mode, demo data off) and scripted WAL archiving, base backup and point-in-time recovery drills.</li>
+          </ul>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="font-display text-[13pt]">Software Development Intern — All Rights Technologies</h3>
+            <span class="label text-ink-500">Jul 2026 · Addis Ababa</span>
+          </div>
+          <ul class="mt-2 list-disc space-y-1 pl-4">
+            <li>Built and shipped features for <em>Tereka</em>, an Android mobile application, in a start-up team working to real users.</li>
+            <li>Worked across the Android UI layer, local persistence and integration with the start-up's back-end services.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="mt-6">
+        <h2 class="label border-b border-rule pb-1 text-ink-500">Education</h2>
+        <div class="mt-3">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="font-display text-[13pt]">BSc Computer Science — St. Mary's University</h3>
+            <span class="label text-ink-500">Feb 2021 — Feb 2026 · Addis Ababa</span>
+          </div>
+          <p class="mt-1">
+            Coursework in data structures, algorithms, database systems and mobile
+            application development; final-year work in Android application development.
+          </p>
+        </div>
+      </section>
+
+      <section class="mt-6">
+        <h2 class="label border-b border-rule pb-1 text-ink-500">Technical skills</h2>
+        <dl class="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+          {skills.map(([k, v]) => (
+            <div class="flex gap-2">
+              <dt class="shrink-0 font-medium">{k}</dt>
+              <dd class="text-ink-700">— {v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section class="mt-6 grid gap-6 sm:grid-cols-2">
+        <div>
+          <h2 class="label border-b border-rule pb-1 text-ink-500">Languages</h2>
+          <dl class="mt-3 space-y-1">
+            {languages.map(([k, v]) => (
+              <div class="flex justify-between gap-4">
+                <dt class="font-medium">{k}</dt>
+                <dd class="text-ink-700">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <div>
+          <h2 class="label border-b border-rule pb-1 text-ink-500">Referees</h2>
+          <div class="mt-3 space-y-2">
+            <div>
+              <p class="font-medium">Nahom Tesfaye</p>
+              <p class="text-ink-700">General Manager, All Rights Technologies</p>
+              <p class="text-ink-500">092 095 8300 · nahomt14@gmail.com</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="mt-8 border-t border-rule pt-3 text-[9pt] text-ink-500">
+        <p>
+          Selected work and full case study: {new URL('/work/imbirt', 'https://hayelom.pages.dev').href}
+          · Code: {contact.github.repo}
+        </p>
+      </footer>
+    </article>
+  </div>
+</Base>
+
+<script>
+  const button = document.getElementById('cv-print');
+  button?.addEventListener('click', () => window.print());
+</script>

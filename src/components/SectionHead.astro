@@ -1,0 +1,31 @@
+---
+interface Props {
+  /** e.g. "§ 02" */
+  serial?: string;
+  /** Small tracked eyebrow. */
+  kicker?: string;
+  title: string;
+  lede?: string;
+  /** Heading level — keeps the document outline honest. */
+  as?: 'h2' | 'h3';
+}
+
+const { serial, kicker, title, lede, as = 'h2' } = Astro.props;
+const Tag = as;
+---
+
+<div class="max-w-3xl">
+  {(serial || kicker) && (
+    <div class="flex items-center gap-3">
+      {serial && <span class="label text-brass-600 tnum">{serial}</span>}
+      {serial && kicker && <span class="h-3 w-px bg-rule-strong" aria-hidden="true" />}
+      {kicker && <span class="label text-ink-500">{kicker}</span>}
+    </div>
+  )}
+
+  <Tag class="mt-3 text-[clamp(1.75rem,4vw,2.75rem)]">{title}</Tag>
+
+  {lede && <p class="mt-4 text-lg text-ink-700 text-pretty">{lede}</p>}
+
+  <div class="dim-rule mt-6" aria-hidden="true" />
+</div>
