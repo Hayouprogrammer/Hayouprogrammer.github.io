@@ -128,168 +128,198 @@
 </style>
 
 <script>
-  const dialog = document.getElementById('plate-lightbox') as HTMLDialogElement | null;
-  if (dialog) {
-    const image = dialog.querySelector<HTMLImageElement>('[data-plate-image]')!;
-    const stage = dialog.querySelector<HTMLElement>('[data-plate-stage]')!;
-    const backdrop = dialog.querySelector<HTMLElement>('[data-plate-backdrop]')!;
-    const plateLabel = dialog.querySelector<HTMLElement>('[data-plate-plate]')!;
-    const caption = dialog.querySelector<HTMLElement>('[data-plate-caption]')!;
-    const counter = dialog.querySelector<HTMLElement>('[data-plate-counter]')!;
-    const zoomLabel = dialog.querySelector<HTMLElement>('[data-plate-zoom-label]')!;
-    const openLink = dialog.querySelector<HTMLAnchorElement>('[data-plate-open]')!;
+/**
+ * Plate viewer wiring.
+ *
+ * Runs once per document. With Astro's ClientRouter the body is swapped on
+ * navigation, which discards the old dialog and its listeners, so this has to
+ * run again after every swap — hence `astro:page-load` and the guard on the
+ * dialog element. Without ClientRouter the event never fires and the immediate
+ * call is the only one.
+ */
 
-    type Plate = {
-      trigger: HTMLButtonElement;
-      full: string;
-      webp: string;
-      plate: string;
-      caption: string;
-      alt: string;
-    };
+const DIALOG_ID = 'plate-lightbox';
+let bound: HTMLDialogElement | null = null;
 
-    const plates: Plate[] = Array.from(
-      document.querySelectorAll<HTMLButtonElement>('[data-plate-trigger]'),
-    ).map((trigger) => ({
-      trigger,
-      full: trigger.dataset.full ?? '',
-      webp: trigger.dataset.fullWebp ?? '',
-      plate: trigger.dataset.plate ?? '',
-      caption: trigger.dataset.caption ?? '',
-      alt: trigger.dataset.alt ?? '',
-    }));
+function init() {
+  const dialog = document.getElementById(DIALOG_ID) as HTMLDialogElement | null;
+  if (!dialog || dialog === bound) return;
+  bound = dialog;
 
-    let index = 0;
-    let scale = 1;
-    let tx = 0;
-    let ty = 0;
-    let opener: HTMLElement | null = null;
+  const image = dialog.querySelector<HTMLImageElement>('[data-plate-image]')!;
+  const stage = dialog.querySelector<HTMLElement>('[data-plate-stage]')!;
+  const plateLabel = dialog.querySelector<HTMLElement>('[data-plate-plate]')!;
+  const caption = dialog.querySelector<HTMLElement>('[data-plate-caption]')!;
+  const counter = dialog.querySelector<HTMLElement>('[data-plate-counter]')!;
+  const zoomLabel = dialog.querySelector<HTMLElement>('[data-plate-zoom-label]')!;
+  const openLink = dialog.querySelector<HTMLAnchorElement>('[data-plate-open]')!;
+  const prevBtn = dialog.querySelector<HTMLButtonElement>('[data-plate-prev]')!;
+  const nextBtn = dialog.querySelector<HTMLButtonElement>('[data-plate-next]')!;
 
-    const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+  type Plate = {
+    trigger: HTMLButtonElement;
+    full: string;
+    webp: string;
+    plate: string;
+    caption: string;
+    alt: string;
+  };
 
-    function apply() {
-      image.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-      zoomLabel.textContent = `${Math.round(scale * 100)}%`;
-    }
+  const plates: Plate[] = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-plate-trigger]'),
+  ).map((trigger) => ({
+    trigger,
+    full: trigger.dataset.full ?? '',
+    webp: trigger.dataset.fullWebp ?? '',
+    plate: trigger.dataset.plate ?? '',
+    caption: trigger.dataset.caption ?? '',
+    alt: trigger.dataset.alt ?? '',
+  }));
 
-    function reset() {
-      scale = 1;
-      tx = 0;
-      ty = 0;
-      apply();
-    }
+  let index = 0;
+  let scale = 1;
+  let tx = 0;
+  let ty = 0;
+  let opener: HTMLElement | null = null;
 
-    function zoomTo(next: number, focalX = 0, focalY = 0) {
-      const prev = scale;
-      const clamped = clamp(next, 1, 6);
-      if (clamped === prev) return;
-      // Keep the point under the cursor stationary while zooming.
-      const k = clamped / prev;
-      tx = focalX - k * (focalX - tx);
-      ty = focalY - k * (focalY - ty);
-      scale = clamped;
-      apply();
-    }
+  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
-    function show(i: number) {
-      index = (i + plates.length) % plates.length;
-      const p = plates[index];
-      if (!p) return;
-      // WebP when it is available, JPEG otherwise.
-      image.src = p.webp || p.full;
-      image.alt = p.alt;
-      plateLabel.textContent = p.plate;
-      caption.textContent = p.caption;
-      counter.textContent = plates.length > 1
+  function apply() {
+    image.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+  }
+
+  function reset() {
+    scale = 1;
+    tx = 0;
+    ty = 0;
+    apply();
+  }
+
+  function zoomTo(next: number, focalX = 0, focalY = 0) {
+    const prev = scale;
+    const clamped = clamp(next, 1, 6);
+    if (clamped === prev) return;
+    // Keep the point under the cursor stationary while zooming.
+    const k = clamped / prev;
+    tx = focalX - k * (focalX - tx);
+    ty = focalY - k * (focalY - ty);
+    scale = clamped;
+    apply();
+  }
+
+  function show(i: number) {
+    index = (i + plates.length) % plates.length;
+    const p = plates[index];
+    if (!p) return;
+    // WebP when it is available, JPEG otherwise.
+    image.src = p.webp || p.full;
+    image.alt = p.alt;
+    plateLabel.textContent = p.plate;
+    caption.textContent = p.caption;
+    counter.textContent =
+      plates.length > 1
         ? `${index + 1} of ${plates.length} plates on this page`
         : 'the only plate on this page';
-      openLink.href = p.full;
-      const prev = dialog.querySelector<HTMLButtonElement>('[data-plate-prev]')!;
-      const next = dialog.querySelector<HTMLButtonElement>('[data-plate-next]')!;
-      prev.disabled = plates.length < 2;
-      next.disabled = plates.length < 2;
-      reset();
-    }
+    openLink.href = p.full;
+    prevBtn.disabled = plates.length < 2;
+    nextBtn.disabled = plates.length < 2;
+    reset();
+  }
 
-    // ---- open ----
-    document.querySelectorAll<HTMLButtonElement>('[data-plate-trigger]').forEach((trigger) => {
-      // Hover magnification follows the pointer so a dense screenshot can be
-      // read in place. Set the origin, then let the CSS transition run.
-      trigger.addEventListener('pointermove', (e) => {
-        const r = trigger.getBoundingClientRect();
-        trigger.style.setProperty('--px', `${((e.clientX - r.left) / r.width) * 100}%`);
-        trigger.style.setProperty('--py', `${((e.clientY - r.top) / r.height) * 100}%`);
-      });
-      trigger.addEventListener('pointerleave', () => {
-        trigger.style.removeProperty('--px');
-        trigger.style.removeProperty('--py');
-      });
+  function close() {
+    if (typeof dialog.close === 'function') dialog.close();
+    else dialog.removeAttribute('open');
+    // Focus goes back to the plate that opened it, not to the top of the page.
+    opener?.focus();
+  }
 
-      trigger.addEventListener('click', () => {
-        const i = plates.findIndex((p) => p.trigger === trigger);
-        if (i < 0) return;
-        opener = trigger;
-        show(i);
-        if (typeof dialog.showModal === 'function') dialog.showModal();
-        else dialog.setAttribute('open', '');
-        (dialog.querySelector<HTMLButtonElement>('[data-plate-close]') ?? dialog).focus();
-      });
+  // ---- triggers, and the 3D tilt on hover ----
+  plates.forEach((p) => {
+    const trigger = p.trigger;
+
+    // Tilt and lift: the rotation is derived from where the pointer sits inside
+    // the frame, so the plate leans toward the cursor as it comes forward.
+    trigger.addEventListener('pointermove', (e) => {
+      const r = trigger.getBoundingClientRect();
+      const nx = (e.clientX - r.left) / r.width;
+      const ny = (e.clientY - r.top) / r.height;
+      trigger.style.setProperty('--px', `${nx * 100}%`);
+      trigger.style.setProperty('--py', `${ny * 100}%`);
+      trigger.style.setProperty('--ry', `${(nx - 0.5) * 9}deg`);
+      trigger.style.setProperty('--rx', `${(0.5 - ny) * 7}deg`);
     });
 
-    // ---- close ----
-    function close() {
-      if (typeof dialog.close === 'function') dialog.close();
-      else dialog.removeAttribute('open');
-      // Focus goes back to the plate that opened it, not to the top of the page.
-      opener?.focus();
-    }
+    const relax = () => {
+      trigger.style.removeProperty('--px');
+      trigger.style.removeProperty('--py');
+      trigger.style.removeProperty('--rx');
+      trigger.style.removeProperty('--ry');
+    };
+    trigger.addEventListener('pointerleave', relax);
+    trigger.addEventListener('blur', relax);
 
-    dialog.querySelector('[data-plate-close]')?.addEventListener('click', close);
-
-    // Close when the click lands on empty chrome rather than on content. Both
-    // the dialog itself and the stage behind the image count.
-    dialog.addEventListener('click', (e) => {
-      if (e.target === dialog) close();
+    trigger.addEventListener('click', () => {
+      const i = plates.findIndex((q) => q.trigger === trigger);
+      if (i < 0) return;
+      opener = trigger;
+      show(i);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+      (dialog.querySelector<HTMLButtonElement>('[data-plate-close]') ?? dialog).focus();
     });
-    stage.addEventListener('click', (e) => {
-      if (e.target === stage) close();
-    });
+  });
 
-    // Clicking the image toggles between fit and a readable zoom.
-    image.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (scale > 1) reset();
-      else zoomTo(2.5);
-    });
+  // ---- controls ----
+  dialog.querySelector('[data-plate-close]')?.addEventListener('click', close);
+  dialog.querySelector('[data-plate-zoom-in]')?.addEventListener('click', () => zoomTo(scale * 1.4));
+  dialog.querySelector('[data-plate-zoom-out]')?.addEventListener('click', () => zoomTo(scale / 1.4));
+  dialog.querySelector('[data-plate-reset]')?.addEventListener('click', reset);
+  prevBtn.addEventListener('click', () => show(index - 1));
+  nextBtn.addEventListener('click', () => show(index + 1));
 
-    // ---- controls ----
-    dialog.querySelector('[data-plate-zoom-in]')?.addEventListener('click', () => zoomTo(scale * 1.4));
-    dialog.querySelector('[data-plate-zoom-out]')?.addEventListener('click', () => zoomTo(scale / 1.4));
-    dialog.querySelector('[data-plate-reset]')?.addEventListener('click', reset);
-    dialog.querySelector('[data-plate-prev]')?.addEventListener('click', () => show(index - 1));
-    dialog.querySelector('[data-plate-next]')?.addEventListener('click', () => show(index + 1));
+  // ---- close on empty chrome ----
+  // Both the dialog itself and the stage behind the image count as background.
+  // Listening on the dialog is what makes the stage reachable at all: a child
+  // wrapper paints above the backdrop and would swallow every click first.
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+  stage.addEventListener('click', (e) => {
+    if (e.target === stage) close();
+  });
 
-    // ---- drag to pan ----
-    // Capture the pointer only once the pointer has actually moved. Capturing
-    // on pointerdown retargets the follow-up `click` to the stage, which would
-    // swallow every click on the image — the zoom toggle would never fire.
-    let dragging = false;
-    let pending = false;
-    let lastX = 0;
-    let lastY = 0;
-    const THRESHOLD = 4;
+  // Clicking the image toggles between fit and a readable zoom.
+  image.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (scale > 1) reset();
+    else zoomTo(2.5);
+  });
 
-    stage.addEventListener('pointerdown', (e) => {
-      if (scale <= 1) return;
-      pending = true;
-      dragging = false;
-      lastX = e.clientX;
-      lastY = e.clientY;
-    });
+  // ---- drag to pan ----
+  // Capture the pointer only once it has actually moved. Capturing on
+  // pointerdown retargets the follow-up `click` to the stage, which would
+  // swallow every click on the image and the zoom toggle would never fire.
+  let dragging = false;
+  let pending = false;
+  let lastX = 0;
+  let lastY = 0;
+  const THRESHOLD = 4;
 
-    stage.addEventListener('pointermove', (e) => {
-      if (!pending || dragging) return;
-      if (Math.abs(e.clientX - lastX) < THRESHOLD && Math.abs(e.clientY - lastY) < THRESHOLD) {
+  stage.addEventListener('pointerdown', (e) => {
+    if (scale <= 1) return;
+    pending = true;
+    dragging = false;
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  stage.addEventListener('pointermove', (e) => {
+    if (pending && !dragging) {
+      if (
+        Math.abs(e.clientX - lastX) < THRESHOLD &&
+        Math.abs(e.clientY - lastY) < THRESHOLD
+      ) {
         return;
       }
       dragging = true;
@@ -299,55 +329,65 @@
       } catch {
         /* capture is an optimisation; panning still works without it */
       }
-    });
-
-    stage.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      tx += e.clientX - lastX;
-      ty += e.clientY - lastY;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      apply();
-    });
-
-    const endDrag = (e: PointerEvent) => {
-      pending = false;
-      dragging = false;
-      if (stage.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId);
-    };
-    stage.addEventListener('pointerup', endDrag);
-    stage.addEventListener('pointercancel', endDrag);
-
-    // ---- wheel to zoom, anchored on the cursor ----
-    stage.addEventListener(
-      'wheel',
-      (e) => {
-        e.preventDefault();
-        const r = stage.getBoundingClientRect();
-        zoomTo(scale * (e.deltaY < 0 ? 1.12 : 1 / 1.12), e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2);
-      },
-      { passive: false },
-    );
-
-    // ---- keyboard ----
-    dialog.addEventListener('keydown', (e) => {
-      const key = e.key;
-      if (key === 'Escape') {
-        e.preventDefault();
-        close();
-      } else if (key === 'ArrowLeft' && plates.length > 1) {
-        show(index - 1);
-      } else if (key === 'ArrowRight' && plates.length > 1) {
-        show(index + 1);
-      } else if (key === '+' || key === '=') {
-        zoomTo(scale * 1.25);
-      } else if (key === '-') {
-        zoomTo(scale / 1.25);
-      } else if (key === '0') {
-        reset();
-      }
-    });
-
+    }
+    if (!dragging) return;
+    tx += e.clientX - lastX;
+    ty += e.clientY - lastY;
+    lastX = e.clientX;
+    lastY = e.clientY;
     apply();
-  }
+  });
+
+  const endDrag = (e: PointerEvent) => {
+    pending = false;
+    dragging = false;
+    if (stage.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId);
+  };
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+
+  // ---- wheel to zoom, anchored on the cursor ----
+  stage.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const r = stage.getBoundingClientRect();
+      zoomTo(
+        scale * (e.deltaY < 0 ? 1.12 : 1 / 1.12),
+        e.clientX - r.left - r.width / 2,
+        e.clientY - r.top - r.height / 2,
+      );
+    },
+    { passive: false },
+  );
+
+  // ---- keyboard ----
+  dialog.addEventListener('keydown', (e) => {
+    const key = e.key;
+    if (key === 'Escape') {
+      e.preventDefault();
+      close();
+    } else if (key === 'ArrowLeft' && plates.length > 1) {
+      show(index - 1);
+    } else if (key === 'ArrowRight' && plates.length > 1) {
+      show(index + 1);
+    } else if (key === '+' || key === '=') {
+      zoomTo(scale * 1.25);
+    } else if (key === '-') {
+      zoomTo(scale / 1.25);
+    } else if (key === '0') {
+      reset();
+    }
+  });
+
+  apply();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init, { once: true });
+} else {
+  init();
+}
+document.addEventListener('astro:page-load', init);
+
 </script>

@@ -103,11 +103,69 @@ check('clicking again returns to fit', back === '100%', `${back}`);
 await page.keyboard.press('Escape');
 check('closed after zoom toggle', !(await dialog.evaluate((d) => d.open)));
 
-// ---- hover magnification ----
-const target = triggers.nth(2);
+// ---- hover: the plate comes toward the viewer ----
+// Its own context with motion allowed: the page above emulates
+// prefers-reduced-motion, and that path is asserted separately at the end.
+const motion = await browser.newContext({
+  viewport: { width: 1440, height: 900 },
+  reducedMotion: 'no-preference',
+});
+const mpage = await motion.newPage();
+await mpage.goto(`${BASE}/work/imbirt`, { waitUntil: 'networkidle' });
+const target = mpage.locator('[data-plate-trigger]').nth(2);
+await target.scrollIntoViewIfNeeded();
+await mpage.mouse.move(2, 2);
 await target.hover();
-const transform = await target.locator('img').evaluate((el) => getComputedStyle(el).transform);
-check('hover magnifies the plate', transform !== 'none' && transform.includes('matrix'), transform.slice(0, 40));
+await mpage.waitForTimeout(600);
+
+const hoverState = await target.locator('img').evaluate((el) => {
+  const cs = getComputedStyle(el);
+  const frame = getComputedStyle(el.parentElement.parentElement);
+  return {
+    transform: cs.transform,
+    tz: cs.getPropertyValue('--tz').trim(),
+    sc: cs.getPropertyValue('--sc').trim(),
+    perspective: frame.perspective,
+  };
+});
+check('hover applies a 3D perspective', hoverState.perspective === '1400px', hoverState.perspective);
+check('hover lifts the plate toward the viewer', hoverState.tz === '44px', `translateZ ${hoverState.tz}`);
+check('hover scales the plate', hoverState.sc === '1.035', `scale ${hoverState.sc}`);
+check('hover produces a 3D matrix', hoverState.transform.startsWith('matrix3d'), hoverState.transform.slice(0, 40));
+
+// Off-centre pointer tilts; a centred one does not.
+await target.hover({ position: { x: 8, y: 8 } });
+await mpage.waitForTimeout(500);
+const tilted = await target.locator('img').evaluate((el) => ({
+  rx: parseFloat(getComputedStyle(el).getPropertyValue('--rx')),
+  ry: parseFloat(getComputedStyle(el).getPropertyValue('--ry')),
+}));
+check('off-centre pointer tilts the plate', Math.abs(tilted.ry) > 3, `ry ${tilted.ry.toFixed(2)}deg rx ${tilted.rx.toFixed(2)}deg`);
+
+// Leaving resets it.
+await mpage.mouse.move(2, 2);
+await mpage.waitForTimeout(500);
+const relaxed = await target.locator('img').evaluate((el) => ({
+  tz: getComputedStyle(el).getPropertyValue('--tz').trim(),
+  ry: getComputedStyle(el).getPropertyValue('--ry').trim(),
+}));
+check('pointer leaving resets the plate', relaxed.tz === '' && relaxed.ry === '', JSON.stringify(relaxed));
+await motion.close();
+
+// ---- reduced motion suppresses the effect entirely ----
+const calm = await browser.newContext({
+  viewport: { width: 1440, height: 900 },
+  reducedMotion: 'reduce',
+});
+const cpage = await calm.newPage();
+await cpage.goto(`${BASE}/work/imbirt`, { waitUntil: 'networkidle' });
+const ctarget = cpage.locator('[data-plate-trigger]').first();
+await ctarget.scrollIntoViewIfNeeded();
+await ctarget.hover();
+await cpage.waitForTimeout(400);
+const calmTransform = await ctarget.locator('img').evaluate((el) => getComputedStyle(el).transform);
+check('reduced motion suppresses the 3D lift', calmTransform === 'none', calmTransform.slice(0, 30));
+await calm.close();
 
 // ---- the plates on the home page too ----
 await page.goto(BASE + '/', { waitUntil: 'networkidle' });

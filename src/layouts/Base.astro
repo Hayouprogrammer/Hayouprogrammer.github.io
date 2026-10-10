@@ -3,6 +3,7 @@ import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import PlateLightbox from '../components/PlateLightbox.astro';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -48,6 +49,13 @@ const canonical = new URL(
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap.xml" />
 
+    <!-- GitHub Pages serves neither _headers nor _redirects, so the security
+         headers Cloudflare gets from public/_headers are simply absent there.
+         They are deliberately NOT reproduced as <meta>: a CSP delivered that
+         way blocks the theme bootstrap and Astro's transition runtime, and a
+         rule that breaks the page is worse than no rule. See DEPLOY.md. -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <!-- Theme resolution before first paint: no flash of the wrong sheet. -->
     <script is:inline>
       (function () {
@@ -67,5 +75,6 @@ const canonical = new URL(
     <slot />
     {!bare && <SiteFooter />}
     <PlateLightbox />
+    <ClientRouter />
   </body>
 </html>

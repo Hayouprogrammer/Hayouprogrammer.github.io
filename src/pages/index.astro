@@ -96,8 +96,11 @@ const stack = [
 
     <div class="mt-8 grid items-start gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
       <div>
-        <h1 class="text-[clamp(2.5rem,7vw,4.5rem)] leading-[0.95]">
-          I build the operational software businesses actually run&nbsp;on.
+        <h1 class="kinetic text-[clamp(2.5rem,7vw,4.5rem)] leading-[0.95]">
+          {['I', 'build', 'the', 'operational', 'software', 'businesses', 'actually', 'run', 'on.']
+            .map((w, i) => (
+              <span style={`animation-delay: ${80 + i * 65}ms`}>{w}&nbsp;</span>
+            ))}
         </h1>
 
         <p class="mt-6 max-w-prose text-lg text-ink-700 text-pretty">
@@ -162,7 +165,7 @@ const stack = [
   </section>
 
   <!-- ================= § 01 — THE PLATFORM ================= -->
-  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 01"
       kicker="The platform"
@@ -218,7 +221,7 @@ const stack = [
   </section>
 
   <!-- ================= § 02 — THE WORK ================= -->
-  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 02"
       kicker="The work"
@@ -255,7 +258,7 @@ const stack = [
   </section>
 
   <!-- ================= § 03 — HOW I WORK ================= -->
-  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 03"
       kicker="Position"
@@ -275,7 +278,7 @@ const stack = [
   </section>
 
   <!-- ================= § 04 — STACK ================= -->
-  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead serial="§ 04" kicker="Stack" title="What I build with." />
 
     <div class="mt-8 max-w-3xl">

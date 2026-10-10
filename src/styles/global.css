@@ -215,6 +215,82 @@
   .dossier::before { left: max(0.75rem, calc(50% - var(--dossier-half, 40rem))); }
   .dossier::after { right: max(0.75rem, calc(50% - var(--dossier-half, 40rem))); }
 
+  /* ---- scroll-driven reveal --------------------------------------------
+     Native CSS scroll-driven animations: no JavaScript, no IntersectionObserver,
+     no jank. The element is fully visible by default — the animation is only
+     ever a subtraction from that state, so if the browser has no
+     `animation-timeline` support the content simply sits there, which is the
+     correct outcome. */
+  .rise {
+    animation: rise-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 26%;
+  }
+
+  .rise-sm {
+    animation: rise-in-sm linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+
+  /* Depth on the way in: content arrives from slightly behind the page, not
+     only from below. */
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 22px, -60px);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes rise-in-sm {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 12px, -30px);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .rise-sm {
+      animation: none;
+    }
+  }
+
+  /* ---- kinetic display type --------------------------------------------
+     The cover's headline arrives word by word rather than fading in whole.
+     One authored moment for the page, exponential ease-out, and it starts from
+     the already-rendered state — so with reduced motion the words are simply
+     there. */
+  .kinetic > span {
+    display: inline-block;
+    animation: word-in 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes word-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.5em, -40px);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kinetic > span {
+      animation: none;
+    }
+  }
+
   /* A ruled hairline with end ticks, like a dimension line. */
   .dim-rule {
     position: relative;
@@ -232,6 +308,16 @@
   }
   .dim-rule::before { left: 0; }
   .dim-rule::after { right: 0; }
+
+  /* ---- the sheet above the binding ------------------------------------
+     In the dark scheme the page is a leather ledger cover, so the document
+     frame reads as a sheet lying on it: a soft inner edge and a lift. This is
+     depth used to say what the object is, not decoration. */
+  .dark .sheet {
+    box-shadow:
+      inset 0 1px 0 rgba(236, 232, 222, 0.05),
+      0 24px 60px -32px rgba(0, 0, 0, 0.9);
+  }
 
   /* Small tracked label — the workhorse of this document. */
   .label {

@@ -1,0 +1,64 @@
+# Deploy to GitHub Pages
+#
+# Chosen for the first launch because it needs no third-party account: the
+# repository already exists, GitHub Actions is already available, and the site
+# is static. Cloudflare Pages remains the better long-term home (unmetered
+# bandwidth, real redirects, custom headers) — see DEPLOY.md for the switch.
+#
+# This is a *user* Pages site (`Hayouprogrammer.github.io`), so it is served
+# from the domain root and no BASE_PATH is injected. Astro does not rewrite
+# literal internal links, so a project site under /portfolio/ would 404 on
+# every route. The base lives in astro.config.mjs and nowhere else.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate derived data
+        run: |
+          node scripts/collect-figures.mjs
+          node scripts/collect_apps.py
+
+      - name: Build
+        env:
+          SITE_URL: https://hayouprogrammer.github.io
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
