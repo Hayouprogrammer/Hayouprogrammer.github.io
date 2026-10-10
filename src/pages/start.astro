@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Viewing guide | Hayelom Gebrewahid"
+  description="Every page of the portfolio, and the one thing to look at on each."
+  plate="PL. 00"
+>
+  <section class="dossier mx-auto w-full max-w-4xl px-4 pt-14 sm:px-6 sm:pt-20">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="label text-brass-600">Plate 00 — Viewing guide</span>
+      <span class="h-3 w-px bg-rule-strong" aria-hidden="true"></span>
+      <span class="label text-ink-500">Everything here is running locally</span>
+    </div>
+
+    <h1 class="mt-8 text-[clamp(2.25rem,6vw,3.75rem)] leading-[1]">
+      Where to look, in the order it matters.
+    </h1>
+
+    <p class="mt-6 max-w-prose text-lg text-ink-700">
+      Six pages. The case study is the one the brochure QR code will point at, so
+      start there. Toggle <strong>Sheet</strong> / <strong>Binding</strong> in the
+      top right to see the two faces of the same document.
+    </p>
+
+    <ol class="mt-12 border-t border-rule-strong">
+      {[
+        {
+          href: '/work/imbirt',
+          title: 'The Imbirt case study',
+          why: 'The flagship and the QR target. Nine sections: the problem, the three planes, provisioning, isolation, the governed AI, both verticals, engineering rigour, an honest list of what is not finished, and the outcome.',
+          look: 'Section 05 — the governed write. And section 08, which lists the known open defects on purpose.',
+        },
+        {
+          href: '/',
+          title: 'The cover',
+          why: 'One thesis, six verified figures, and the platform section diagram drawn from the module graph.',
+          look: 'The ruled figures strip — every number there is generated from your repository by a script.',
+        },
+        {
+          href: '/work',
+          title: 'Index of work',
+          why: 'Four case studies, all angles on the same system.',
+          look: 'Nothing here yet that the case study does not carry in more depth.',
+        },
+        {
+          href: '/about',
+          title: 'About',
+          why: 'Positioning, the record, capabilities and languages.',
+          look: 'The "delete 43 files" principle — the argument for removing code is stated there too.',
+        },
+        {
+          href: '/contact',
+          title: 'Contact',
+          why: 'Every channel, plus what you are available for.',
+          look: 'The brochure panel — it recognises the leaflet a visitor arrived from.',
+        },
+        {
+          href: '/cv',
+          title: 'Curriculum vitae',
+          why: 'A4, print-ready. Save as PDF from the button at the top.',
+          look: 'It is a document, not a web page — check it prints clean.',
+        },
+      ].map((p, i) => (
+        <li class="border-b border-rule">
+          <a href={p.href} class="group grid gap-3 py-7 no-underline sm:grid-cols-[3.5rem_1fr] sm:gap-6">
+            <span class="font-display text-3xl text-brass-600 tnum">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span>
+              <span class="block font-display text-[1.5rem] leading-tight text-ink-900 group-hover:underline sm:text-[1.75rem]">
+                {p.title}
+              </span>
+              <span class="mt-2 block max-w-prose text-ink-700">{p.why}</span>
+              <span class="mt-3 flex items-baseline gap-2.5">
+                <span class="label shrink-0 text-ledger-500">Look at</span>
+                <span class="text-sm text-ink-500">{p.look}</span>
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-14 border border-rule bg-paper-raised p-6">
+      <p class="label text-ink-500">The printed path</p>
+      <p class="mt-3 max-w-prose text-ink-700">
+        <a href="/imbirt" class="font-mono text-base">/imbirt</a> is the URL the
+        brochure QR code encodes. It redirects to the case study. Try it — it is
+        deliberately short, typeable and stable, so reorganising the case study
+        later never breaks a leaflet already in someone's hand.
+      </p>
+    </div>
+  </section>
+</Base>

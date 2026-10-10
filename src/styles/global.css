@@ -272,7 +272,6 @@
     height: 100%;
   }
 }
-
 @layer utilities {
   .tnum { font-variant-numeric: tabular-nums lining-nums; }
   .geez { font-family: var(--font-geez); }

@@ -19,8 +19,19 @@ interface Props {
 const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false } = Astro.props;
 ---
 
-<figure class="group">
-  <div class="plate-frame overflow-hidden border border-rule bg-paper-raised shadow-plate" style={`aspect-ratio: ${aspect}`}>
+<figure class="group plate" data-plate>
+  <button
+    type="button"
+    class="plate-trigger block w-full cursor-zoom-in overflow-hidden border border-rule bg-paper-raised text-left shadow-plate transition-[box-shadow,border-color] duration-200 hover:border-rule-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-600"
+    style={`aspect-ratio: ${aspect}`}
+    data-plate-trigger
+    data-full={`${src}.jpg`}
+    data-full-webp={`${src}.webp`}
+    data-plate={plate}
+    data-caption={caption}
+    data-alt={alt}
+    aria-label={`Enlarge ${plate}: ${caption}`}
+  >
     <picture>
       <source srcset={`${src}.webp`} type="image/webp" />
       <img
@@ -29,10 +40,19 @@ const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false 
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
         fetchpriority={priority ? 'high' : 'auto'}
-        class="block h-full w-full object-cover"
+        class="plate-img block h-full w-full object-cover"
       />
     </picture>
-  </div>
+
+    <!-- Affordance. Present in the DOM, revealed on hover/focus so it is
+         discoverable without becoming a permanent overlay on every plate. -->
+    <span
+      class="plate-hint label pointer-events-none absolute bottom-2 right-2 bg-ledger-900/95 px-2 py-1 text-bone opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+      aria-hidden="true"
+    >
+      Click to enlarge
+    </span>
+  </button>
 
   <figcaption class="mt-2.5 flex items-baseline justify-between gap-4">
     <span class="flex items-baseline gap-2.5">
@@ -42,3 +62,45 @@ const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false 
     {measure && <span class="label hidden shrink-0 text-ink-300 tnum sm:inline">{measure}</span>}
   </figcaption>
 </figure>
+
+<style>
+  /* A <picture> is inline by default, which leaves its <img> with no definite
+     height to resolve height:100% against. Make it fill the frame. */
+  .plate-trigger > picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .plate-trigger {
+    position: relative;
+  }
+
+  /* Hover magnification. The origin follows the pointer so a dense screenshot
+     can be read in place, without a click. */
+  .plate-img {
+    transform-origin: var(--px, 50%) var(--py, 50%);
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+
+  .plate-trigger:hover .plate-img,
+  .plate-trigger:focus-visible .plate-img {
+    transform: scale(1.75);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plate-img {
+      transition: none;
+    }
+    .plate-trigger:hover .plate-img,
+    .plate-trigger:focus-visible .plate-img {
+      transform: none;
+    }
+    /* Reduced motion still gets the magnification, just not animated — the
+       information is the point, the transition is not. */
+    .plate-trigger:hover .plate-img {
+      transform: scale(1.75);
+    }
+  }
+</style>

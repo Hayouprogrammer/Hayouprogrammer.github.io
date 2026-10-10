@@ -94,21 +94,36 @@ hard offset shadows, sparklines and progress rings, monospace as costume for
 
 ## The figures
 
-Two of them carry the page, and both are **measured drawings rather than
-screenshots**:
+Every plate is a real capture of a reachable product state — 13 screenshots,
+1600×1000 @2x, from the control plane and from two provisioned tenants
+(`t_skyline_hotel`, 98 installed modules; `t_adama_properties`, 88). A plate that
+could not be captured renders an explicit "capture pending" panel naming the
+missing file. There are none left.
+
+Two figures are **measured drawings rather than screenshots**, and both say so:
 
 - **The platform section** (`ArchitectureSection.astro`) — three planes with a
-  dimension gutter, drawn from the module graph. It is labelled "drawn from the
-  module graph", so it is a diagram and never mistaken for a screenshot.
+  dimension gutter, drawn from the module graph. Labelled "drawn from the module
+  graph", so it is never mistaken for a screenshot.
 - **The governed write** (`AiGovernanceFigure.astro`) — the risk ladder, the
   preview payload, and the pending record. Field names, risk tiers, the masking
   rule and the TTL are read from `addons/imbirt_ai`. The values are illustrative
-  and the figure says so on its face, because no LLM endpoint existed on the
+  and the figure declares it on its face, because no LLM endpoint existed on the
   capture machine and nothing is faked.
 
-Product screenshots are real captures of a reachable state. A plate that could
-not be captured renders an explicit "not captured" panel naming the missing file
-— an honest gap, never a stock image.
+## Interaction
+
+One authored moment, and it is a real feature rather than decoration: **the
+plate viewer**. Hovering a plate magnifies it up to 1.75× with the origin
+tracking the pointer, so a dense screenshot can be read in place. Clicking opens
+a native `<dialog>` — which brings the focus trap, Escape and the top layer for
+free — with click-to-zoom on the image, drag to pan, wheel and +/− to zoom, 0 to
+fit, ← → to move between plates, and focus returned to the plate that opened it.
+
+`scripts/test-plate-viewer.mjs` drives all of it in a real browser: 19 assertions,
+including that focus leaves the plate and comes back, and that the wheel zoom
+does not silently break the click handler (pointer capture is taken only after
+the pointer has actually moved, otherwise it retargets the follow-up click).
 
 ## Motion
 

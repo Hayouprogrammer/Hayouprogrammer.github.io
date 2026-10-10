@@ -9,6 +9,7 @@ import ArchitectureSection from '../../components/ArchitectureSection.astro';
 import AiGovernanceFigure from '../../components/AiGovernanceFigure.astro';
 import QrTracker from '../../components/QrTracker.astro';
 import figures from '../../data/figures.json';
+import apps from '../../data/applications.json';
 
 const fmt = (n: number) => n.toLocaleString('en-US');
 
@@ -252,29 +253,24 @@ const meta: Array<[string, string]> = [
           dies — the monitoring is monitored.
         </p>
       </div>
-      <Shot
-        file="dashboard.png"
-        plate="FIG. 07"
-        caption="The operations console: fleet health, what needs attention, and the deployment feed."
-        alt="Imbirt Ops console showing system health, environments needing attention and a recent deployments feed"
-        measure="1600 × 1000"
-      />
+      <Shot file="ops-console.png" plate="FIG. 07" caption="The operations console: fleet health, what needs attention, and the deployment feed." alt="Imbirt Ops console showing system health, environments needing attention and a recent deployments feed" measure="1600 x 1000" />
     </div>
 
-    <div class="mt-10 w-full max-w-[22rem]">
-      <Shot
-        file="mobile-dashboard.png"
-        plate="FIG. 08"
-        caption="The same console on a phone, at 420 px."
-        alt="Imbirt Ops console rendered at a mobile viewport"
-        aspect="420 / 900"
-      />
+    <div class="mt-10 flex flex-wrap items-end gap-8">
+      <div class="w-full max-w-[22rem]">
+        <Shot
+          file="mobile-dashboard.png"
+          plate="FIG. 08"
+          caption="The same console on a phone, at 420 px."
+          alt="Imbirt Ops console rendered at a mobile viewport"
+          aspect="420 / 900"
+        />
+      </div>
+      <p class="max-w-xs text-sm text-ink-500">
+        An ERP nobody can check from the corridor of their own hotel is a desktop
+        application, not an operating system.
+      </p>
     </div>
-
-    <p class="max-w-xs text-sm text-ink-500 lg:pt-6">
-      An ERP nobody can check from the corridor of their own hotel is a desktop
-      application, not an operating system.
-    </p>
   </section>
 
   <!-- ================= § 04 ISOLATION ================= -->
@@ -375,10 +371,86 @@ const meta: Array<[string, string]> = [
     </div>
   </section>
 
-  <!-- ================= § 06 VERTICALS ================= -->
+  <!-- ================= § 06 WHAT A TENANT ACTUALLY GETS ================= -->
   <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 06"
+      kicker="The catalog"
+      title="Thirty-five applications. A client never sees the other sixty-nine."
+      lede="A client does not buy an ERP with 300 modules. They buy one industry solution. This is what they choose from — and the rule that deciding is the whole job."
+    />
+
+    <div class="mt-10 grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:items-start">
+      <div class="text-lg text-ink-700">
+        <p>
+          Every module on the platform is either <strong class="font-medium text-ink-900">sellable</strong>
+          or it is not, and that split is enforced in one place: the picker, the
+          request-approval path, the import path and the app-line constraint all read
+          the same policy. An operator cannot attach a module that is not on the list,
+          however they reach for it.
+        </p>
+        <p class="mt-4">
+          What is <em>not</em> sellable is a record of a decision, not an accident.
+          Framework plumbing is plumbing. Sub-capabilities are reached through their
+          parent — Attendance lives inside Human Resources, To-Do inside Project — so a
+          client is never offered half an application, and never billed twice for one
+          thing.
+        </p>
+        <p class="mt-4">
+          And the important part: picking an application installs <em>every</em> addon
+          built for it. Choose Human Resources and all twenty modules that make up the
+          People surface arrive. Choose Accounting and all nineteen: the ledger, the
+          Ethiopian customisations, payment batches, reconciliation, assets, budgets,
+          follow-ups and commissions.
+        </p>
+      </div>
+
+      <div class="border border-rule bg-paper-raised p-6">
+        <Shot
+          file="apps-picker.png"
+          plate="FIG. 18"
+          caption="The application catalog, as the operator picks from it while creating a tenant."
+          alt="Imbirt Application Catalog listing the sellable applications"
+          measure="1600 × 1000"
+        />
+      </div>
+    </div>
+
+    <div class="mt-14">
+      <RuleTable
+        caption={`Table 5 — the ${apps.catalogApplications} applications a client can buy, grouped as the catalog groups them`}
+        rows={apps.groups.flatMap((g) =>
+          g.applications.map((a) => [
+            a.name,
+            `${a.installs} module${a.installs === 1 ? '' : 's'}`,
+            a.installs > 1 ? a.profile.join(' · ') : 'installed on its own',
+          ]),
+        )}
+      />
+      <p class="mt-4 text-sm text-ink-500">
+        Read straight from <span class="font-mono">addons/imbirt_tenant_ops/data/sellable_apps.py</span>
+        and <span class="font-mono">data/app_profiles.py</span> by
+        <span class="font-mono">scripts/collect_apps.py</span>. Module counts include the
+        application itself. {apps.notSellable} modules are never offered.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-px border border-rule bg-rule sm:grid-cols-3">
+      {apps.packages.map((p) => (
+        <div class="bg-paper p-7">
+          <p class="label text-brass-600">{p.target}</p>
+          <h3 class="mt-2 text-2xl">{p.title}</h3>
+          <p class="mt-3 text-ink-700">{p.description}</p>
+          <p class="label mt-4 text-ink-500 tnum">{p.modules} modules in the package</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ================= § 07 VERTICALS ================= -->
+  <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+    <SectionHead
+      serial="§ 07"
       kicker="The verticals"
       title="Hospitality and property, built on the same spine."
     />
@@ -408,26 +480,28 @@ const meta: Array<[string, string]> = [
         </ul>
       </div>
       <div class="grid gap-6 sm:grid-cols-2">
-        <Shot file="hotel-frontdesk.png" plate="FIG. 09" caption="Reservations at the front desk." alt="Imbirt hotel reservations list" />
-        <Shot file="housekeeping.png" plate="FIG. 10" caption="The housekeeping lifecycle." alt="Imbirt housekeeping board" />
-        <Shot file="tenant-dashboard.png" plate="FIG. 11" caption="The tenant executive dashboard: occupancy, collections, delinquency." alt="Imbirt executive dashboard" />
-        <Shot file="pos.png" plate="FIG. 12" caption="White-labelled Point of Sale." alt="Imbirt white-labelled point of sale" />
+        <Shot file="hotel-frontdesk.png" plate="FIG. 09" caption="Reservations at the front desk: seventeen live bookings across every stage." alt="Imbirt hotel reservations list" />
+        <Shot file="housekeeping.png" plate="FIG. 10" caption="The housekeeping board. Note the inspection column — that is the gate." alt="Imbirt housekeeping board" />
+        <Shot file="dashboard.png" plate="FIG. 11" caption="The tenant executive dashboard: collections, overdue and occupancy." alt="Imbirt executive dashboard" />
+        <Shot file="pos.png" plate="FIG. 12" caption="Point of Sale: a settled order in a branded session." alt="Imbirt Point of Sale session and order" />
       </div>
       <p class="mt-4 max-w-prose text-sm text-ink-500">
-        These plates are captured from a provisioned hospitality tenant. Until that
-        tenant is provisioned and seeded, the panels above say so rather than
-        showing an empty list and calling it the product.
+        Captured from a provisioned hospitality tenant with seeded data:
+        <strong class="font-medium text-ink-700">98 installed modules</strong>, 17 reservations,
+        and a housekeeping board carrying one done task, one waiting for inspection and
+        five still to do.
       </p>
     </div>
 
-    <div class="mt-12 w-full max-w-[22rem]">
-      <Shot file="tenant-dashboard-mobile.png" plate="FIG. 12" caption="The tenant dashboard on a phone, at 420 px." alt="Imbirt tenant executive dashboard on a mobile viewport" aspect="420 / 900" />
+    <div class="mt-10 flex flex-wrap items-end gap-8">
+      <div class="w-full max-w-[22rem]">
+        <Shot file="mobile-dashboard.png" plate="FIG. 13" caption="The same dashboard on a phone, at 420 px." alt="Imbirt executive dashboard on a mobile viewport" aspect="420 / 900" />
+      </div>
+      <p class="max-w-xs text-sm text-ink-500">
+        An ERP nobody can check from the corridor of their own hotel is a desktop
+        application, not an operating system.
+      </p>
     </div>
-
-    <p class="max-w-xs text-sm text-ink-500 lg:pt-6">
-      An ERP nobody can check from the corridor of their own hotel is a desktop
-      application, not an operating system.
-    </p>
 
     <div id="property" class="mt-20 grid gap-12 lg:grid-cols-[1fr_1fr]">
       <div class="lg:order-2">
@@ -455,17 +529,22 @@ const meta: Array<[string, string]> = [
         </ul>
       </div>
       <div class="grid gap-6 sm:grid-cols-2 lg:order-1">
-        <Shot file="property-portfolio.png" plate="FIG. 13" caption="The property portfolio." alt="Imbirt property portfolio kanban" />
-        <Shot file="lease.png" plate="FIG. 14" caption="A lease contract with its rent schedule." alt="Imbirt lease contract form" />
-        <Shot file="report-rent-roll.png" plate="FIG. 15" caption="The rent roll and delinquency report." alt="Imbirt rent roll report" />
+        <Shot file="property-portfolio.png" plate="FIG. 14" caption="The portfolio: twelve units across two buildings, with lease references." alt="Imbirt property portfolio" />
+        <Shot file="lease.png" plate="FIG. 15" caption="A lease contract with its rent schedule — paid, due and scheduled." alt="Imbirt lease contract form with rent schedule" />
+        <Shot file="report-rent-roll.png" plate="FIG. 16" caption="The rent roll. 126,000 due, 220,400 collected, 812,400 scheduled." alt="Imbirt rent roll and delinquency report" />
       </div>
+      <p class="mt-4 max-w-prose text-sm text-ink-500 lg:col-span-2">
+        Captured from a provisioned property tenant with seeded data:
+        <strong class="font-medium text-ink-700">88 installed modules</strong>, two
+        buildings, twelve units and three live lease contracts.
+      </p>
     </div>
   </section>
 
   <!-- ================= § 07 ENGINEERING ================= -->
   <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
-      serial="§ 07"
+      serial="§ 08"
       kicker="Engineering"
       title="The part a technical buyer should ask about."
       lede="A one-person platform is only credible if the repository shows the discipline. These are the checks that are running, not the ones that were planned."
@@ -514,7 +593,7 @@ const meta: Array<[string, string]> = [
       </div>
 
       <div class="space-y-6">
-        <Shot file="login.png" plate="FIG. 16" caption="The white-labelled login — the tenant's own brand from the first screen." alt="Imbirt branded login screen" measure="1600 × 1000" />
+        <Shot file="login.png" plate="FIG. 17" caption="The white-labelled login, the tenant's own brand from the first screen." alt="Imbirt branded login screen" measure="1600 x 1000" />
         <RuleTable
           caption="Table 3 — what CI enforces"
           rows={[
@@ -532,7 +611,7 @@ const meta: Array<[string, string]> = [
   <!-- ================= § 08 HONEST LIMITS ================= -->
   <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
-      serial="§ 08"
+      serial="§ 09"
       kicker="Honest limits"
       title="What is not finished, stated plainly."
       lede="I would rather you heard this from me than found it in a pilot. Every item below is recorded in the project's own current-state document."
@@ -558,14 +637,14 @@ const meta: Array<[string, string]> = [
   <!-- ================= § 09 OUTCOME ================= -->
   <section class="dossier mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
-      serial="§ 09"
+      serial="§ 10"
       kicker="Outcome"
       title="One person now operates the whole fleet."
     />
 
     <div class="mt-10 grid gap-px border border-rule bg-rule sm:grid-cols-3">
       {[
-        ['From zero to a running hotel ERP', 'One action: database, 14-module hospitality profile, admin, groups, state. Rolled back whole on failure.'],
+        ['From zero to a running hotel ERP', 'One action: database created and its privileges separated, the hospitality install profile run, admin seeded, owner granted exactly the groups the job needs. 98 modules, no half-built tenant.'],
         ['From shared to isolated', 'Every tenant in its own PostgreSQL database, on its own least-privilege role. One tenant going wrong cannot reach another.'],
         ['From powerful to safe', 'An AI assistant inside an ERP that prepares anything and writes only what a human confirmed.'],
       ].map(([t, b]) => (

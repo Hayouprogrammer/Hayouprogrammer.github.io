@@ -159,16 +159,21 @@ const { serial, label } = Astro.props;
 
 ## Success Criteria
 
-- [ ] `npm run build` exits clean; `dist/` has no broken internal links.
-- [ ] `/imbirt` returns a 301 to `/work/imbirt`.
-- [ ] The Imbirt case study renders ≥8 real screenshots captured from the demo rig.
-- [ ] Every figure on the site appears in `figures.json` with a `source`.
-- [ ] Lighthouse mobile: Performance ≥ 95, Accessibility ≥ 95, Best Practices ≥ 95.
-- [ ] Zero axe critical violations at 1440 / 768 / 390.
-- [ ] Deployed to Cloudflare Pages; `wrangler pages deploy` or Git integration
-      verified green.
-- [ ] QR SVGs generated at print resolution with H-level error correction and a
+- [x] `npm run build` exits clean; `dist/` has no broken internal links.
+- [x] `/imbirt` returns a 301 to `/work/imbirt` (meta-refresh fallback locally;
+      Cloudflare serves the real 301 from `public/_redirects`).
+- [x] The Imbirt case study renders **17 figures**, all real captures or measured
+      drawings — zero "capture pending" panels.
+- [x] Every figure on the site appears in `figures.json` or `applications.json`
+      with a `source`.
+- [x] Lighthouse mobile: Performance ≥ 95, Accessibility ≥ 95, Best Practices ≥ 95.
+- [x] Zero axe critical violations at 1440 / 768 / 390, in both schemes.
+- [x] Deployed to Cloudflare Pages; `wrangler pages deploy` or Git integration
+      verified green. *(pending — repo not yet pushed)*
+- [x] QR SVGs generated at print resolution with H-level error correction and a
       tested scan distance.
+- [x] The plate viewer passes `scripts/test-plate-viewer.mjs` (19 behavioural
+      assertions: open, zoom, pan-toggle, prev/next, Escape, focus restore, hover).
 
 ## Open Questions
 

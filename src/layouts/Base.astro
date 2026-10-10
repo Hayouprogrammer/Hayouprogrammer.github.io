@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import PlateLightbox from '../components/PlateLightbox.astro';
 
 interface Props {
   title: string;
@@ -65,5 +66,6 @@ const canonical = new URL(
     {!bare && <SiteHeader plate={plate} />}
     <slot />
     {!bare && <SiteFooter />}
+    <PlateLightbox />
   </body>
 </html>

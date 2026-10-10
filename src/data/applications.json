@@ -1,0 +1,417 @@
+{
+  "generatedAt": "2026-10-10T11:31:24.275375",
+  "source": "addons/imbirt_tenant_ops/data/sellable_apps.py + data/app_profiles.py",
+  "sellableByPolicy": 35,
+  "notSellable": 69,
+  "catalogApplications": 35,
+  "implementationOnly": [],
+  "domainOrder": [
+    "People",
+    "Finance",
+    "Sales & supply",
+    "Projects & service",
+    "Documents",
+    "Web & engagement",
+    "Hospitality",
+    "Property",
+    "Imbirt"
+  ],
+  "groups": [
+    {
+      "domain": "People",
+      "applications": [
+        {
+          "module": "hr",
+          "name": "Human Resources",
+          "installs": 20,
+          "profile": [
+            "hr",
+            "hr_attendance",
+            "hr_holidays",
+            "hr_recruitment",
+            "hr_expense",
+            "hr_skills",
+            "hr_timesheet",
+            "lunch",
+            "fleet",
+            "hr_timesheet_attendance",
+            "hr_holidays_attendance",
+            "hr_work_entry",
+            "hr_work_entry_holidays",
+            "hr_presence",
+            "hr_org_chart",
+            "hr_calendar",
+            "hr_homeworking",
+            "hr_holidays_homeworking",
+            "hr_homeworking_calendar",
+            "hr_recruitment_skills"
+          ]
+        },
+        {
+          "module": "payroll",
+          "name": "Payroll",
+          "installs": 1,
+          "profile": [
+            "payroll"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Finance",
+      "applications": [
+        {
+          "module": "om_account_accountant",
+          "name": "Accounting",
+          "installs": 19,
+          "profile": [
+            "om_account_accountant",
+            "account",
+            "accounting_pdf_reports",
+            "om_account_asset",
+            "om_account_budget",
+            "om_account_daily_reports",
+            "om_account_followup",
+            "om_fiscal_year",
+            "om_recurring_payments",
+            "eh_account_base",
+            "eh_account_pdc",
+            "account_payment_base_oca",
+            "account_payment_batch_oca",
+            "account_payment_method_base",
+            "account_reconcile_oca",
+            "account_statement_base",
+            "account_commission_oca",
+            "commission_oca",
+            "sale_commission_oca"
+          ]
+        },
+        {
+          "module": "aos_company_bank_loan",
+          "name": "Bank Loans",
+          "installs": 1,
+          "profile": [
+            "aos_company_bank_loan"
+          ]
+        },
+        {
+          "module": "contract",
+          "name": "Contracts",
+          "installs": 1,
+          "profile": [
+            "contract"
+          ]
+        },
+        {
+          "module": "mis_builder",
+          "name": "MIS Reporting",
+          "installs": 1,
+          "profile": [
+            "mis_builder"
+          ]
+        },
+        {
+          "module": "subscription_oca",
+          "name": "Subscriptions",
+          "installs": 1,
+          "profile": [
+            "subscription_oca"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Sales & supply",
+      "applications": [
+        {
+          "module": "barcodes_generator_product",
+          "name": "Barcode generator",
+          "installs": 1,
+          "profile": [
+            "barcodes_generator_product"
+          ]
+        },
+        {
+          "module": "crm",
+          "name": "CRM / Pipeline",
+          "installs": 1,
+          "profile": [
+            "crm"
+          ]
+        },
+        {
+          "module": "stock",
+          "name": "Inventory",
+          "installs": 1,
+          "profile": [
+            "stock"
+          ]
+        },
+        {
+          "module": "maintenance",
+          "name": "Maintenance & field service",
+          "installs": 3,
+          "profile": [
+            "maintenance",
+            "fieldservice",
+            "repair"
+          ]
+        },
+        {
+          "module": "mrp",
+          "name": "Manufacturing",
+          "installs": 2,
+          "profile": [
+            "mrp",
+            "quality_control_oca"
+          ]
+        },
+        {
+          "module": "product_multi_barcode",
+          "name": "Multi-barcode products",
+          "installs": 1,
+          "profile": [
+            "product_multi_barcode"
+          ]
+        },
+        {
+          "module": "point_of_sale",
+          "name": "Point of Sale",
+          "installs": 2,
+          "profile": [
+            "point_of_sale",
+            "imbirt_pos_debrand"
+          ]
+        },
+        {
+          "module": "purchase",
+          "name": "Purchase",
+          "installs": 1,
+          "profile": [
+            "purchase"
+          ]
+        },
+        {
+          "module": "quality_control_oca",
+          "name": "Quality",
+          "installs": 1,
+          "profile": [
+            "quality_control_oca"
+          ]
+        },
+        {
+          "module": "pos_restaurant",
+          "name": "Restaurant POS",
+          "installs": 1,
+          "profile": [
+            "pos_restaurant"
+          ]
+        },
+        {
+          "module": "sale",
+          "name": "Sales",
+          "installs": 2,
+          "profile": [
+            "sale",
+            "sale_management"
+          ]
+        },
+        {
+          "module": "sale_management",
+          "name": "Sales management",
+          "installs": 1,
+          "profile": [
+            "sale_management"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Projects & service",
+      "applications": [
+        {
+          "module": "sign_oca",
+          "name": "E-signature",
+          "installs": 1,
+          "profile": [
+            "sign_oca"
+          ]
+        },
+        {
+          "module": "helpdesk_mgmt",
+          "name": "Helpdesk",
+          "installs": 1,
+          "profile": [
+            "helpdesk_mgmt"
+          ]
+        },
+        {
+          "module": "project",
+          "name": "Project",
+          "installs": 3,
+          "profile": [
+            "project",
+            "project_todo",
+            "project_task_planning"
+          ]
+        },
+        {
+          "module": "project_timeline",
+          "name": "Project timeline",
+          "installs": 1,
+          "profile": [
+            "project_timeline"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Documents",
+      "applications": [
+        {
+          "module": "document_knowledge",
+          "name": "Documents",
+          "installs": 2,
+          "profile": [
+            "document_knowledge",
+            "dms"
+          ]
+        },
+        {
+          "module": "document_page",
+          "name": "Pages & wiki",
+          "installs": 1,
+          "profile": [
+            "document_page"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Web & engagement",
+      "applications": [
+        {
+          "module": "calendar",
+          "name": "Calendar",
+          "installs": 1,
+          "profile": [
+            "calendar"
+          ]
+        },
+        {
+          "module": "website_event",
+          "name": "Events",
+          "installs": 1,
+          "profile": [
+            "website_event"
+          ]
+        },
+        {
+          "module": "website_hr_recruitment",
+          "name": "Recruitment site",
+          "installs": 1,
+          "profile": [
+            "website_hr_recruitment"
+          ]
+        },
+        {
+          "module": "survey",
+          "name": "Surveys",
+          "installs": 1,
+          "profile": [
+            "survey"
+          ]
+        },
+        {
+          "module": "website",
+          "name": "Website",
+          "installs": 1,
+          "profile": [
+            "website"
+          ]
+        },
+        {
+          "module": "website_sale",
+          "name": "eCommerce",
+          "installs": 1,
+          "profile": [
+            "website_sale"
+          ]
+        },
+        {
+          "module": "website_slides",
+          "name": "eLearning",
+          "installs": 1,
+          "profile": [
+            "website_slides"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Hospitality",
+      "applications": [
+        {
+          "module": "hms_imbirt",
+          "name": "Hotel Management",
+          "installs": 2,
+          "profile": [
+            "hms_imbirt",
+            "imbirt_pos_debrand"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Property",
+      "applications": [
+        {
+          "module": "pms_base",
+          "name": "Property Management",
+          "installs": 3,
+          "profile": [
+            "pms_base",
+            "pms_sale",
+            "pms_account"
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Imbirt",
+      "applications": [
+        {
+          "module": "imbirt_social",
+          "name": "Social publishing",
+          "installs": 1,
+          "profile": [
+            "imbirt_social"
+          ]
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "id": "business",
+      "title": "Hiber Business Management Package",
+      "target": "Trading, services, distribution",
+      "description": "Accounting, sales, purchase, inventory, projects, documents, workflow approvals and the AI assistant (bring-your-own provider key). Executive dashboards and payroll are add-ons.",
+      "modules": 14
+    },
+    {
+      "id": "hospitality",
+      "title": "Hiber Hospitality Package",
+      "target": "Hotels, lodges, guest houses",
+      "description": "Reservations, front desk, rate plans, guest folios, night audit, housekeeping with inspection gating, POS debranding, executive dashboards and the AI assistant (bring-your-own provider key).",
+      "modules": 14
+    },
+    {
+      "id": "property",
+      "title": "Hiber Property & Real Estate Package",
+      "target": "Landlords, property managers, developers",
+      "description": "Lease lifecycle with automatic rent schedules and invoicing, deposits, maintenance, utility metering, unit-sale pipeline with agent commissions, owner accounting, tenant/owner portals, rent-roll and delinquency reporting, plus the AI assistant (bring-your-own provider key).",
+      "modules": 15
+    }
+  ]
+}
