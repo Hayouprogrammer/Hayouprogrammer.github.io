@@ -9,13 +9,26 @@
  *
  * Writes src/data/figures.json. Run it again after any module change.
  */
-import { readdirSync, statSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readdirSync, statSync, readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname } from 'node:path';
 import { execSync } from 'node:child_process';
 
 const REPO = process.env.IMBIRT_REPO ?? 'C:/src/ethio-erp-addons';
+
+// The collectors read the live ERP tree. In CI there is none, and the committed
+// src/data/*.json is the artifact — so a missing tree is a hard, loud failure
+// rather than a silently wrong one.
+if (!existsSync(REPO)) {
+  console.error(
+    `collect-figures: ${REPO} not found.\n` +
+      'This script reads the ethio-erp-addons working tree and is local tooling.\n' +
+      'Set IMBIRT_REPO to point at it. src/data/figures.json is committed derived\n' +
+      'data and does not need regenerating to build or deploy.',
+  );
+  process.exit(1);
+}
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'figures.json');
 
 const SOURCE_EXTS = new Set(['.py', '.xml', '.js', '.scss', '.css', '.csv']);

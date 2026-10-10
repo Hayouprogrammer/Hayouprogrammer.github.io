@@ -39,10 +39,10 @@ jobs:
 
       - run: npm ci
 
-      - name: Generate derived data
-        run: |
-          node scripts/collect-figures.mjs
-          node scripts/collect_apps.py
+      # src/data/*.json is committed derived data. The collectors that produce it
+      # read the ethio-erp-addons working tree, which this workflow has no access
+      # to — so it is generated locally and committed, exactly like a lockfile.
+      # Regenerate with `npm run figures` and `node scripts/collect_apps.py`.
 
       - name: Build
         env:

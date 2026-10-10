@@ -6,10 +6,13 @@ Odoo 19.0 Community for Ethiopian hospitality, property and trading businesses.
 Built with Astro, Tailwind CSS v4 and self-hosted type. No client-side framework,
 no third-party font request, no trackers, no cookie banner.
 
+**Live:** https://hayouprogrammer.github.io/
+
 ```powershell
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # → dist/
+npm run gate     # build + QR decode + contrast + accessibility, one command
 ```
 
 ## Documents
@@ -17,10 +20,10 @@ npm run build    # → dist/
 | File | What it is |
 |---|---|
 | [`SPEC.md`](SPEC.md) | What this site is for, the stack, the route map, the quality gates |
-| [`DEPLOY.md`](DEPLOY.md) | Why Cloudflare Pages, how to deploy, and the domain migration path |
+| [`DEPLOY.md`](DEPLOY.md) | Where it is hosted now, why not Vercel, and the domain migration path |
 | [`BROCHURE.md`](BROCHURE.md) | The printed-leaflet strategy, the QR specification, and the copy |
 | [`public/qr/README.md`](public/qr/README.md) | Print-ready QR codes and the exact spec for the print shop |
-| [`DESIGN.md`](DESIGN.md) | The visual system — tokens, type, components, and why |
+| [`DESIGN.md`](DESIGN.md) | The visual system — tokens, type, motion, components, and why |
 
 ## Scripts
 
@@ -30,10 +33,24 @@ npm run build    # → dist/
 | `npm run check` | Astro type and content check |
 | `npm run capture` | Re-capture the Imbirt product screenshots |
 | `npm run figures` | Re-derive every published number from `ethio-erp-addons` |
-| `node scripts/audit.mjs` | Accessibility, overflow, console and request gate across light / dark / mobile |
-| `node scripts/contrast.mjs` | WCAG contrast check on every token pair |
-| `node scripts/make-qr.mjs` | Regenerate the print QR codes |
-| `node scripts/verify-qr.mjs` | Decode the generated QR codes back to text and prove the payload |
+| `npm run apps` | Re-derive the application catalog from `ethio-erp-addons` |
+| `npm run images` | Optimise the captures to WebP + JPEG |
+| `npm run qr` | Regenerate the print QR codes |
+| `npm run verify-qr` | Decode the generated QR codes back to text and prove the payload |
+| `npm run audit` | Accessibility, overflow, console and request gate — light, dark, mobile |
+| `npm run viewer` | Behavioural test of the plate viewer in a real browser |
+| `npm run contrast` | WCAG contrast check on every token pair |
+| `npm run gate` | Build + QR decode + contrast + audit, in one command |
+
+## Derived data
+
+`src/data/figures.json` and `src/data/applications.json` are **committed derived
+data**, produced by reading the `ethio-erp-addons` working tree on the machine
+that has it. They are generated locally and committed, exactly like a lockfile:
+CI cannot see that tree, and the committed files are what the build consumes.
+
+Something in Imbirt moved a published number? Run `npm run figures` and
+`npm run apps`, then commit the result.
 
 ## The one rule
 

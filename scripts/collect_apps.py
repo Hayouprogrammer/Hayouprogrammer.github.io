@@ -21,9 +21,16 @@ import os
 import re
 import sys
 
-REPO = "C:/src/ethio-erp-addons"
-if "--repo" in sys.argv:
-    REPO = sys.argv[sys.argv.index("--repo") + 1]
+REPO = os.environ.get("IMBIRT_REPO", "C:/src/ethio-erp-addons")
+
+if not os.path.isdir(REPO):
+    sys.stderr.write(
+        "collect_apps: %s not found.\n"
+        "This script reads the ethio-erp-addons working tree and is local tooling.\n"
+        "Set IMBIRT_REPO to point at it. src/data/applications.json is committed\n"
+        "derived data and does not need regenerating to build or deploy.\n" % REPO
+    )
+    raise SystemExit(1)
 
 BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SELLABLE = os.path.join(REPO, "addons", "imbirt_tenant_ops", "data", "sellable_apps.py")

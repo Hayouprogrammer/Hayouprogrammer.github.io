@@ -24,9 +24,17 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          SITE_URL: https://hayouprogrammer.github.io
         run: npm run build
 
-      # The site must be served to be audited; preview it behind a port.
+      # The derived data in src/data/*.json is committed, not generated here: the
+      # collectors read the ethio-erp-addons working tree, which CI cannot see.
+      # Regenerate locally with `npm run figures` and `node scripts/collect_apps.py`.
+
+      - name: Install the browser the audit needs
+        run: npx playwright install --with-deps chromium
+
       - name: Preview
         run: |
           npx astro preview --port 4321 --host 127.0.0.1 &

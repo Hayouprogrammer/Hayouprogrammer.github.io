@@ -15,7 +15,10 @@
     "verify-qr": "node scripts/verify-qr.mjs",
     "figures": "node scripts/collect-figures.mjs",
     "audit": "node scripts/audit.mjs",
-    "gate": "npm run build && node scripts/verify-qr.mjs && node scripts/contrast.mjs && node scripts/audit.mjs"
+    "gate": "npm run build && node scripts/verify-qr.mjs && node scripts/contrast.mjs && node scripts/audit.mjs",
+    "apps": "python scripts/collect_apps.py",
+    "viewer": "node scripts/test-plate-viewer.mjs",
+    "contrast": "node scripts/contrast.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.2.5",

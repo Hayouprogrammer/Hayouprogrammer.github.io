@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T19:03:55.051Z",
+  "generatedAt": "2026-10-10T18:56:32.817Z",
   "repo": {
     "remote": "https://github.com/Hayouprogrammer/ethio-erp-addons.git",
     "addonTrees": 81
@@ -7,12 +7,12 @@
   "code": {
     "customTrees": 27,
     "authoredTrees": 23,
-    "files": 574,
-    "lines": 80442
+    "files": 578,
+    "lines": 81327
   },
   "tests": {
-    "files": 119,
-    "functions": 911
+    "files": 120,
+    "functions": 920
   },
   "runtime": {
     "platform": "Odoo 19.0 Community",
@@ -32,14 +32,14 @@
       "authored": true,
       "licence": "LGPL-3.0-or-later",
       "files": 76,
-      "lines": 21626
+      "lines": 21682
     },
     {
       "module": "imbirt_ai",
       "authored": true,
       "licence": "LGPL-3.0-or-later",
       "files": 29,
-      "lines": 16983
+      "lines": 16996
     },
     {
       "module": "imbirt_social",
@@ -52,22 +52,22 @@
       "module": "imbirt_lease",
       "authored": true,
       "licence": "LGPL-3.0-or-later",
-      "files": 42,
-      "lines": 5148
+      "files": 43,
+      "lines": 5425
     },
     {
       "module": "pms_sale",
       "authored": false,
       "licence": "AGPL-3.0 (modified upstream)",
-      "files": 55,
-      "lines": 3762
+      "files": 57,
+      "lines": 4098
     },
     {
       "module": "pms_base",
       "authored": false,
       "licence": "AGPL-3.0 (modified upstream)",
       "files": 49,
-      "lines": 3056
+      "lines": 3060
     },
     {
       "module": "hms_imbirt",
@@ -112,18 +112,18 @@
       "lines": 1425
     },
     {
+      "module": "imbirt_hotel",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 20,
+      "lines": 1405
+    },
+    {
       "module": "imbirt_brand",
       "authored": true,
       "licence": "LGPL-3.0-or-later",
       "files": 28,
       "lines": 1403
-    },
-    {
-      "module": "imbirt_hotel",
-      "authored": true,
-      "licence": "LGPL-3.0-or-later",
-      "files": 20,
-      "lines": 1335
     },
     {
       "module": "imbirt_housekeeping",
@@ -138,6 +138,13 @@
       "licence": "LGPL-3.0-or-later",
       "files": 14,
       "lines": 838
+    },
+    {
+      "module": "imbirt_sale",
+      "authored": true,
+      "licence": "LGPL-3.0-or-later",
+      "files": 14,
+      "lines": 795
     },
     {
       "module": "imbirt_property_ui",
@@ -159,13 +166,6 @@
       "licence": "LGPL-3.0-or-later",
       "files": 11,
       "lines": 672
-    },
-    {
-      "module": "imbirt_sale",
-      "authored": true,
-      "licence": "LGPL-3.0-or-later",
-      "files": 13,
-      "lines": 666
     },
     {
       "module": "imbirt_tenant_lockdown",
