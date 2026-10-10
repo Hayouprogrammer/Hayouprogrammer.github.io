@@ -18,7 +18,8 @@
     "gate": "npm run build && node scripts/verify-qr.mjs && node scripts/contrast.mjs && node scripts/audit.mjs",
     "apps": "python scripts/collect_apps.py",
     "viewer": "node scripts/test-plate-viewer.mjs",
-    "contrast": "node scripts/contrast.mjs"
+    "contrast": "node scripts/contrast.mjs",
+    "verify-live": "node scripts/verify-live.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.2.5",
