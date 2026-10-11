@@ -1,11 +1,11 @@
-# QR codes for print — 2026-10-09
+# QR codes for print — 2026-10-11
 
 ## Encoded targets
 
 | File | Payload |
 |---|---|
-| `imbirt-brochure.svg` | https://hayelom.pages.dev/imbirt |
-| `imbirt-brochure.png` | https://hayelom.pages.dev/imbirt (3 cm @ 300 dpi proof) |
+| `imbirt-brochure.svg` | https://hayouprogrammer.github.io/imbirt |
+| `imbirt-brochure.png` | https://hayouprogrammer.github.io/imbirt (3 cm @ 300 dpi proof) |
 | `vcard.svg` | vCard — Hayelom Gebrewahid |
 | `vcard.png` | vCard (proof raster) |
 
@@ -24,7 +24,7 @@
 
 ## The rule that makes this safe
 
-The QR encodes **`https://hayelom.pages.dev/imbirt`**. That is a redirect, not the content. When the
+The QR encodes **`https://hayouprogrammer.github.io/imbirt`**. That is a redirect, not the content. When the
 domain changes:
 
 1. Buy and point the new domain at the same host.

@@ -1,5 +1,5 @@
 {
-  "$comment": "Edit `target` when the domain changes, then re-run `node scripts/make-qr.mjs` and reprint. Never print a code that points at a hosting subdomain.",
-  "target": "https://hayelom.pages.dev/imbirt",
-  "vcard": "https://hayelom.pages.dev/contact"
+  "$comment": "Edit `target` when the domain changes, then re-run `node scripts/make-qr.mjs` and reprint. Never print a code that points at a hosting subdomain you do not own. Currently live: https://hayouprogrammer.github.io/ — still a hosting subdomain, so this is a TEST print only until hayelom.pages.dev-style custom domain is bought and pointed here.",
+  "target": "https://hayouprogrammer.github.io/imbirt",
+  "vcard": "https://hayouprogrammer.github.io/contact"
 }
