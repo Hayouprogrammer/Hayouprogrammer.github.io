@@ -50,19 +50,58 @@ const font = await page.evaluate(() => {
 });
 check('display face loaded', /Bodoni/i.test(font), font.slice(0, 40));
 
-// The 3D hover lift is wired on the deployed build too.
-await page.goto(`${BASE}/work/imbirt`, { waitUntil: 'domcontentloaded' });
+// The loupe, on the deployed bundle: a dim field opens, it is centred on the
+// cursor, and the capture sharpens inside it. This is the plate interaction
+// that replaced a 3D tilt — the tilt moved the whole picture and told you
+// nothing, whereas this makes one region of a dense Odoo screen readable.
+await page.goto(`${BASE}/work`, { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(2500);
-const plate = page.locator('[data-plate-trigger]').first();
-await plate.scrollIntoViewIfNeeded();
+const dplate = page.locator('[data-plate-trigger]').first();
+await dplate.scrollIntoViewIfNeeded();
 await page.mouse.move(4, 4);
-await plate.hover();
-await page.waitForTimeout(700);
-const lift = await plate.locator('img').evaluate((el) => getComputedStyle(el).getPropertyValue('--tz').trim());
-check('deployed 3D hover lift works', lift === '44px', `translateZ ${lift}`);
+await dplate.hover();
+await page.waitForTimeout(800);
+const loupe = await dplate.evaluate((el) => {
+  const lamp = el.querySelector('.plate-lamp');
+  const img = el.querySelector('img');
+  return {
+    lamp: lamp ? getComputedStyle(lamp).opacity : '',
+    mx: el.style.getPropertyValue('--mx').trim(),
+    filter: img ? getComputedStyle(img).filter : '',
+  };
+});
+check('the loupe opens on the deployed build', loupe.lamp === '1', `spotlight opacity ${loupe.lamp}`);
+check(
+  'the spotlight tracks the cursor',
+  Math.abs(parseFloat(loupe.mx) - 50) < 6,
+  `${loupe.mx}`,
+);
+check('the capture sharpens inside the spotlight', loupe.filter.includes('saturate'), loupe.filter);
+
+// The word reveal is driven by the scroll timeline, which is the part that was
+// silently dead for a long time. Prove the deployed build has a live one — on a
+// short viewport, because on a full-height one the statement is already inside
+// the frame and its entry range has elapsed before the first sample.
+const sw = await browser.newContext({
+  viewport: { width: 1440, height: 560 },
+  reducedMotion: 'no-preference',
+});
+const spage = await sw.newPage();
+await spage.goto(`${BASE}/work`, { waitUntil: 'domcontentloaded' });
+await spage.waitForTimeout(2000);
+const wordStates = new Set();
+for (const y of [0, 300, 600, 1000, 1400]) {
+  await spage.evaluate((v) => window.scrollTo(0, v), y);
+  await spage.waitForTimeout(220);
+  wordStates.add(
+    await spage.evaluate(() => getComputedStyle(document.querySelector('.word-lit span')).color),
+  );
+}
+check('the word reveal is live on the deployed build', wordStates.size > 1, `${wordStates.size} states`);
+await sw.close();
 
 // The immersive viewer opens on the deployed build.
-await plate.click();
+await dplate.click();
 await page.waitForTimeout(400);
 check('deployed viewer opens', await page.locator('#plate-lightbox').evaluate((d) => d.open));
 await page.keyboard.press('Escape');
