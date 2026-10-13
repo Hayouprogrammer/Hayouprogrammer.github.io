@@ -8,10 +8,7 @@ import { existsSync } from 'node:fs';
 
 const BASE = process.argv[2] ?? process.env.LIVE_URL ?? 'https://hayouprogrammer.github.io';
 
-const exe = [
-  process.env.PLAYWRIGHT_CHROMIUM,
-  'C:/Users/hayel/AppData/Local/ms-playwright/chromium-1247/chrome-win64/chrome.exe',
-].find((p) => p && existsSync(p));
+import { launchOptions } from './browser.mjs';
 
 const results = [];
 const check = (name, ok, detail = '') => {
@@ -19,7 +16,7 @@ const check = (name, ok, detail = '') => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
 };
 
-const browser = await chromium.launch({ executablePath: exe });
+const browser = await chromium.launch(launchOptions());
 const context = await browser.newContext({
   viewport: { width: 1440, height: 900 },
   reducedMotion: 'no-preference',

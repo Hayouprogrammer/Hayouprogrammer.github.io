@@ -19,7 +19,10 @@
     "apps": "python scripts/collect_apps.py",
     "viewer": "node scripts/test-plate-viewer.mjs",
     "contrast": "node scripts/contrast.mjs",
-    "verify-live": "node scripts/verify-live.mjs"
+    "verify-live": "node scripts/verify-live.mjs",
+    "verify-features": "node scripts/verify-features.mjs",
+    "verify-dark": "node scripts/verify-dark.mjs",
+    "verify-headers": "node scripts/verify-headers.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.2.5",

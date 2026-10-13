@@ -5,6 +5,7 @@ import Shot from '../../components/Shot.astro';
 import RuleTable from '../../components/RuleTable.astro';
 import Stamp from '../../components/Stamp.astro';
 import ContactBand from '../../components/ContactBand.astro';
+import ContentsBar from '../../components/ContentsBar.astro';
 import ArchitectureSection from '../../components/ArchitectureSection.astro';
 import AiGovernanceFigure from '../../components/AiGovernanceFigure.astro';
 import QrTracker from '../../components/QrTracker.astro';
@@ -25,7 +26,7 @@ const meta: Array<[string, string]> = [
 
 <Base
   title="Case study: Imbirt — a multi-tenant ERP on Odoo 19 | Hayelom Gebrewahid"
-  description="How I designed and built Imbirt: one platform that provisions a hotel, a property portfolio or a trading business in one action, with one PostgreSQL database per tenant and an AI assistant that never writes without asking."
+  description="How I designed and built Imbirt: a complete back office on Odoo 19 — people, finance, stock, sales, projects, documents and the website — with one database per customer and an AI assistant that never writes without asking."
   plate="CS. 01"
 >
   <!-- ================= MASTHEAD ================= -->
@@ -44,21 +45,39 @@ const meta: Array<[string, string]> = [
     </h1>
 
     <p class="mt-6 max-w-prose text-lg text-ink-700 text-pretty">
-      Imbirt runs hospitality, property and trading businesses on Odoo 19 Community.
-      It was designed from the first commit around one question: what does it take
-      for a hotel in Addis Ababa to get a system that is genuinely theirs, isolated
-      from every other customer, and safe to let an AI assistant touch?
+      Imbirt runs the whole back office of a business — people, money, stock,
+      sales, projects, documents and the website — and arrives pre-built for
+      hotels, landlords and trading companies. It was designed from the first
+      commit around one question: what does it take for a hotel in Addis Ababa
+      to get a system that is genuinely theirs, isolated from every other
+      customer, and safe to let an AI assistant touch?
     </p>
 
     <div class="mt-8 flex flex-wrap gap-2">
-      <Stamp tone="ledger">Odoo 19.0 Community</Stamp>
-      <Stamp tone="brass">LGPL-3</Stamp>
-      <Stamp tone="ink">No Enterprise code</Stamp>
-      <Stamp tone="brass">One database per tenant</Stamp>
+      <Stamp tone="ledger">No per-user licence</Stamp>
+      <Stamp tone="brass">Cloud or your own server</Stamp>
+      <Stamp tone="ink">Built on Odoo 19</Stamp>
+      <Stamp tone="brass">One database per customer</Stamp>
     </div>
 
     <div class="dim-rule mt-10" aria-hidden="true" />
   </section>
+
+  <!-- ================= CONTENTS ================= -->
+  <ContentsBar
+    items={[
+      { serial: '01', label: 'The problem', href: '#problem' },
+      { serial: '02', label: 'What I built', href: '#built' },
+      { serial: '03', label: 'The core claim', href: '#claim' },
+      { serial: '04', label: 'Isolation', href: '#isolation' },
+      { serial: '05', label: 'The governed assistant', href: '#ai' },
+      { serial: '06', label: 'The catalog', href: '#scope' },
+      { serial: '07', label: 'The verticals', href: '#verticals' },
+      { serial: '08', label: 'Engineering', href: '#engineering' },
+      { serial: '09', label: 'Honest limits', href: '#limits' },
+      { serial: '10', label: 'Outcome', href: '#outcome' },
+    ]}
+  />
 
   <!-- ================= META TABLE ================= -->
   <section class="dossier mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6">
@@ -66,7 +85,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 01 THE PROBLEM ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="problem" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 01"
       kicker="The problem"
@@ -120,7 +139,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 02 WHAT I BUILT ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="built" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 02"
       kicker="What I built"
@@ -179,7 +198,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 03 PROVISIONING ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="claim" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 03"
       kicker="The core claim"
@@ -274,7 +293,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 04 ISOLATION ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="isolation" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 04"
       kicker="Isolation"
@@ -372,7 +391,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 06 WHAT A TENANT ACTUALLY GETS ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="scope" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 06"
       kicker="The catalog"
@@ -448,7 +467,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 07 VERTICALS ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="verticals" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 07"
       kicker="The verticals"
@@ -542,7 +561,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 07 ENGINEERING ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="engineering" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 08"
       kicker="Engineering"
@@ -609,7 +628,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 08 HONEST LIMITS ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="limits" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 09"
       kicker="Honest limits"
@@ -635,7 +654,7 @@ const meta: Array<[string, string]> = [
   </section>
 
   <!-- ================= § 09 OUTCOME ================= -->
-  <section class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
+  <section id="outcome" class="dossier rise mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6">
     <SectionHead
       serial="§ 10"
       kicker="Outcome"

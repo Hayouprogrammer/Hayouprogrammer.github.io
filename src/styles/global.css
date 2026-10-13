@@ -55,6 +55,25 @@
 
   --plate-shadow: 0 1px 0 rgba(21, 24, 26, 0.08), 0 14px 34px -20px rgba(13, 51, 45, 0.45);
   --paper-grain: 0.5;
+
+  /* ---- pre-mixed alphas -------------------------------------------------
+     These exist because `color-mix(in srgb, var(--x) 13%, transparent)` is not
+     safe through this build. The CSS transformer cannot resolve a custom
+     property inside color-mix(), so its fallback for browsers without
+     color-mix support is the *un-mixed* colour — which turned the desk lamp
+     into an opaque brass block covering the top of the page, and the grain
+     into solid hairlines. A token cannot be mis-evaluated, and it also puts
+     the scheme's alpha values where they belong: in the scheme. */
+  --lamp-brass: rgba(210, 164, 76, 0.13);
+  --lamp-ledger: rgba(29, 107, 92, 0.08);
+  --grain-h: rgba(21, 24, 26, 0.026);
+  --grain-v: rgba(21, 24, 26, 0.018);
+  --grain-fibre: rgba(21, 24, 26, 0.012);
+  --veil: rgba(21, 24, 26, 0.34);
+  --ring-brass: rgba(210, 164, 76, 0.7);
+  --sheet-top: var(--paper-raised);
+  --edge-lamp: rgba(210, 164, 76, 0.22);
+  --sheet-lift: rgba(21, 24, 26, 0.05);
 }
 
 .dark {
@@ -84,6 +103,18 @@
 
   --plate-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 18px 40px -22px rgba(0, 0, 0, 0.8);
   --paper-grain: 0.9;
+
+  /* Dark values for the pre-mixed alphas. See the comment in :root. */
+  --lamp-brass: rgba(216, 171, 82, 0.15);
+  --lamp-ledger: rgba(43, 138, 118, 0.11);
+  --grain-h: rgba(236, 232, 222, 0.03);
+  --grain-v: rgba(236, 232, 222, 0.022);
+  --grain-fibre: rgba(236, 232, 222, 0.015);
+  --veil: rgba(3, 9, 8, 0.62);
+  --ring-brass: rgba(230, 193, 121, 0.65);
+  --sheet-top: #101f1b;
+  --edge-lamp: rgba(216, 171, 82, 0.22);
+  --sheet-lift: rgba(236, 232, 222, 0.06);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -157,19 +188,71 @@
     height: auto;
   }
 
-  /* The laid-paper ground of a printed sheet. */
+  /* ---- the desk ---------------------------------------------------------
+     Two fixed layers behind everything, and neither of them scrolls with the
+     content — which is what makes the page feel like an object on a surface
+     rather than a column of text.
+
+     Layer 1, the grain: a real laid-paper tooth. The original version was a
+     single 3px gradient at 0.5 opacity, which read as a faint moiré and
+     nothing else. Crossed hairlines at two angles plus a very low-opacity
+     fibre break is what actually reads as paper, and it costs nothing because
+     it is a fixed pseudo-element on a single composited layer. */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: -2;
     pointer-events: none;
     opacity: var(--paper-grain);
-    background-image: repeating-linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--ink-900) 2%, transparent) 0 1px,
-      transparent 1px 3px
-    );
+    background-image:
+      repeating-linear-gradient(90deg, var(--grain-h) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(0deg, var(--grain-v) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(28deg, var(--grain-fibre) 0 1px, transparent 1px 11px);
+  }
+
+  /* ---- the desk lamp ---------------------------------------------------
+     A single brass light source, top-centre, that drifts down the page as you
+     read. It is the one thing on the site that moves without being asked to,
+     and it is driven by the *scroll* timeline rather than a timer, so it is
+     perfectly correlated with the reader and costs no JavaScript.
+
+     Brass, because the palette has exactly one accent and this is what it is
+     for. It is 3% opacity: below the threshold where you would name it, above
+     the threshold where the page feels lit. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: -20% -10% auto -10%;
+    height: 90vh;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        52rem 34rem at 50% 0%,
+        var(--lamp-brass) 0%,
+        transparent 68%
+      ),
+      radial-gradient(
+        36rem 26rem at 78% 12%,
+        var(--lamp-ledger) 0%,
+        transparent 70%
+      );
+    /* Longhands, not the shorthand — same reason as `.rise`. */
+    animation-name: lamp-drift;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes lamp-drift {
+    from { transform: translate3d(0, -6vh, 0); opacity: 0.85; }
+    to   { transform: translate3d(0, 26vh, 0); opacity: 0.35; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after { animation: none; }
   }
 
   h1, h2, h3, h4 {
@@ -220,17 +303,37 @@
      no jank. The element is fully visible by default — the animation is only
      ever a subtraction from that state, so if the browser has no
      `animation-timeline` support the content simply sits there, which is the
-     correct outcome. */
-  .rise {
-    animation: rise-in linear both;
+     correct outcome.
+
+     The range is `entry`, not `cover`. `cover` on an element taller than the
+     viewport stretches across the element's whole height, which is why the
+     first version of this was invisible: a 4000px case-study section faded in
+     over 1000px of scroll and nobody ever caught it mid-transition. `entry`
+     ends when the element's bottom reaches the viewport bottom, so a short
+     block reveals inside the first glimpse of it — which is what reads as a
+     scroll effect. */
+  .rise,
+  .rise-block,
+  .rise-card {
+    /* Longhands only, never the `animation` shorthand. See the note in
+       astro.config.mjs: a minifier that folds `animation-timeline` into the
+       shorthand produces a declaration Chromium discards, which turns every
+       scroll-driven reveal into a silent no-op. */
+    animation-name: rise-in;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
     animation-timeline: view();
-    animation-range: entry 0% cover 26%;
+    animation-range: entry 0% entry 58%;
   }
 
   .rise-sm {
-    animation: rise-in-sm linear both;
+    animation-name: rise-in-sm;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
     animation-timeline: view();
-    animation-range: entry 0% cover 22%;
+    animation-range: entry 0% entry 68%;
   }
 
   /* Depth on the way in: content arrives from slightly behind the page, not
@@ -238,7 +341,7 @@
   @keyframes rise-in {
     from {
       opacity: 0;
-      transform: translate3d(0, 22px, -60px);
+      transform: translate3d(0, 20px, -40px);
     }
     to {
       opacity: 1;
@@ -249,7 +352,7 @@
   @keyframes rise-in-sm {
     from {
       opacity: 0;
-      transform: translate3d(0, 12px, -30px);
+      transform: translate3d(0, 10px, -22px);
     }
     to {
       opacity: 1;
@@ -259,7 +362,46 @@
 
   @media (prefers-reduced-motion: reduce) {
     .rise,
+    .rise-block,
+    .rise-card,
     .rise-sm {
+      animation: none;
+    }
+  }
+
+  /* ---- the word-by-word reveal -----------------------------------------
+     A statement resolves word by word as it crosses the reading band: each
+     word starts dim and settles to full ink. The per-word `animation-range`
+     is written inline by the component, so the stagger is authored rather
+     than delayed — with a progress timeline, `animation-delay` means scroll
+     distance, not time, and the result is a jumble.
+
+     This is the effect that was missing: it is the only reveal on the site
+     that is legible *while it happens*, because the text stays in place and
+     only its weight changes. */
+  .word-lit > span {
+    display: inline-block;
+    /* Longhands, not the shorthand — same reason as `.rise` above. */
+    animation-name: word-light;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: view();
+  }
+
+  @keyframes word-light {
+    from {
+      color: var(--ink-300);
+      opacity: 0.45;
+    }
+    to {
+      color: var(--ink-900);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .word-lit > span {
       animation: none;
     }
   }
@@ -309,14 +451,128 @@
   .dim-rule::before { left: 0; }
   .dim-rule::after { right: 0; }
 
+  /* ---- the reading rail -------------------------------------------------
+     A dimension line down the left margin whose brass fill is the reader's
+     position in the document. It borrows the vocabulary already on the page —
+     the hairline with end ticks is a measurement — and turns it into the one
+     piece of chrome that tells you how much is left.
+
+     Fixed and pointer-transparent, so it never participates in layout and
+     never intercepts a click. The fill is a scaleY on a transform, which is
+     the cheapest thing a compositor can do, driven by the scroll timeline. */
+  .reading-rail {
+    position: fixed;
+    left: max(0.75rem, calc(50% - var(--dossier-half, 40rem) - 1.75rem));
+    top: 50%;
+    transform: translateY(-50%);
+    height: min(42vh, 22rem);
+    width: 1px;
+    background: var(--rule);
+    z-index: 30;
+    pointer-events: none;
+  }
+  .reading-rail::before,
+  .reading-rail::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    width: 7px;
+    height: 1px;
+    background: var(--rule-strong);
+  }
+  .reading-rail::before { top: 0; }
+  .reading-rail::after { bottom: 0; }
+
+  .reading-rail > i {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--brass-600);
+    transform-origin: top;
+    transform: scaleY(0);
+    /* Longhands, not the shorthand — same reason as `.rise`. */
+    animation-name: rail-fill;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes rail-fill {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+
+  /* Below the breakpoint where the dossier has a margin to spare, the rail is
+     a line drawn over the content and reads as a stray artefact. Hidden.
+     80rem, not 90rem: at exactly 1440px — a very common laptop width — a 90rem
+     query would hide the only ambient indicator of reading progress. */
+  @media (max-width: 80rem) {
+    .reading-rail { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-rail > i { animation: none; transform: scaleY(1); }
+  }
+
   /* ---- the sheet above the binding ------------------------------------
-     In the dark scheme the page is a leather ledger cover, so the document
-     frame reads as a sheet lying on it: a soft inner edge and a lift. This is
-     depth used to say what the object is, not decoration. */
-  .dark .sheet {
+     The page *is* a sheet of paper on a desk, and the two schemes are two
+     different materials rather than two colour inversions.
+
+     Light — The Sheet: bright laid paper under a window. The tooth in the
+     grain is what you see; the shadow is a warm green-tinted contact shadow,
+     because the accent of this document is ledger green and a neutral black
+     shadow would belong to a different world.
+
+     Dark — The Binding: the same sheet, now under a desk lamp, on a leather
+     ledger cover. The sheet picks up a band of light across its top that dies
+     out down the page, it grows a lit edge you could catch a fingernail under,
+     and the grain gets heavier because low light shows more tooth.
+
+     This rule was dead CSS for a long time: it existed, but nothing carried
+     the class, so the depth never rendered and both schemes read as the same
+     flat colour. The class now lives on the frame in Base.astro. */
+  .sheet {
+    position: relative;
+    z-index: 0;
+    background:
+      linear-gradient(
+        180deg,
+        var(--sheet-top) 0%,
+        var(--paper) 22rem,
+        var(--paper) 100%
+      );
     box-shadow:
-      inset 0 1px 0 rgba(236, 232, 222, 0.05),
-      0 24px 60px -32px rgba(0, 0, 0, 0.9);
+      0 1px 0 var(--sheet-lift),
+      0 30px 70px -55px rgba(13, 51, 45, 0.55);
+  }
+
+  .dark .sheet {
+    background:
+      linear-gradient(
+        180deg,
+        var(--sheet-top) 0%,
+        var(--paper) 34rem,
+        var(--paper) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(236, 232, 222, 0.07),
+      inset 0 0 0 1px rgba(236, 232, 222, 0.04),
+      0 1px 0 rgba(0, 0, 0, 0.7),
+      0 44px 100px -55px rgba(0, 0, 0, 0.95),
+      0 70px 140px -80px rgba(13, 51, 45, 0.5);
+  }
+
+  /* The ruled edge of the page. In the dark scheme it catches the lamp, so the
+     margin of the sheet reads as a lit rule rather than a grey hairline. */
+  .dark .dossier::before,
+  .dark .dossier::after {
+    background: linear-gradient(
+      180deg,
+      var(--edge-lamp) 0%,
+      var(--rule) 22rem,
+      var(--rule) 100%
+    );
   }
 
   /* Small tracked label — the workhorse of this document. */

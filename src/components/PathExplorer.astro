@@ -1,0 +1,300 @@
+---
+/**
+ * PathExplorer — "which of these is you?"
+ *
+ * The work page used to be a list of four links, three of which were anchors
+ * into the same case-study page. A hotel owner arriving there had to read the
+ * flagship, work out that CS.02–04 were sections of it, and then hunt for the
+ * part that described their own business. That is the site doing the visitor's
+ * work badly, and it is the single biggest reason the page read as complicated.
+ *
+ * This replaces it with the question a buyer actually arrives with. Pick the
+ * sentence that describes you and the page re-points itself: the screenshot, the
+ * applications that get switched on for you, and the thing you stop doing.
+ *
+ * It is a real ARIA tablist — arrow keys move between paths, the panels are
+ * proper regions, and it is reachable without a mouse. The script re-initialises
+ * on `astro:page-load` because ClientRouter swaps the body on navigation.
+ */
+import Shot from './Shot.astro';
+import apps from '../data/applications.json';
+
+interface Path {
+  id: string;
+  tab: string;
+  kicker: string;
+  title: string;
+  shot: string;
+  plate: string;
+  caption: string;
+  proof: string;
+  alt: string;
+  turnsOn: string[];
+  modules: number;
+  href: string;
+}
+
+const pkg = (id: string) => apps.packages.find((p) => p.id === id)!;
+
+const paths: Path[] = [
+  {
+    id: 'hospitality',
+    tab: 'I run a hotel, lodge or guest house',
+    kicker: 'Hiber Hospitality Package',
+    title: 'Front desk to night audit — and housekeeping that cannot be skipped.',
+    shot: 'hotel-frontdesk.png',
+    plate: 'FIG. 01',
+    caption: 'Front desk: reservations, rate plans and guest folios on one screen.',
+    proof: 'A room that is occupied, cleaned and inspected is a different state from one that is merely empty — and the system knows the difference.',
+    alt: 'Imbirt hotel front desk showing reservations, rate plans and guest folios',
+    turnsOn: ['Hotel Management', 'Point of Sale', 'Accounting', 'Payroll', 'Maintenance & field service'],
+    modules: pkg('hospitality').modules,
+    href: '/work/imbirt#hospitality',
+  },
+  {
+    id: 'property',
+    tab: 'I manage property or leases',
+    kicker: 'Hiber Property & Real Estate Package',
+    title: 'Leases that invoice themselves, and owner statements that reconcile.',
+    shot: 'property-portfolio.png',
+    plate: 'FIG. 02',
+    caption: 'The unit portfolio: lease, tenant, rent schedule and state.',
+    proof: 'A rent roll is one query against the ledger, not a spreadsheet somebody maintains by hand.',
+    alt: 'Imbirt property portfolio listing units with lease status and rent schedules',
+    turnsOn: ['Property Management', 'Accounting', 'Contracts', 'E-signature', 'CRM / Pipeline'],
+    modules: pkg('property').modules,
+    href: '/work/imbirt#property',
+  },
+  {
+    id: 'business',
+    tab: 'I trade, manufacture or distribute',
+    kicker: 'Hiber Business Management Package',
+    title: 'Stock, sales, purchase and the books — one system, not four.',
+    shot: 'dashboard.png',
+    plate: 'FIG. 03',
+    caption: 'The executive dashboard: what the business did today.',
+    proof: 'The dashboard reads the same tables the accounting entries are written to, so the numbers cannot disagree.',
+    alt: 'Imbirt executive dashboard showing sales, purchase and inventory figures',
+    turnsOn: ['Sales', 'Inventory', 'Purchase', 'Manufacturing', 'Quality', 'Accounting'],
+    modules: pkg('business').modules,
+    href: '/work/imbirt',
+  },
+  {
+    id: 'whole',
+    tab: 'I want the whole back office',
+    kicker: 'Every domain, one platform',
+    title: 'People, money, stock, sales, projects, documents and the website.',
+    shot: 'ops-console.png',
+    plate: 'FIG. 04',
+    caption: 'The operations console: what is installed, for whom, and what it costs.',
+    proof: 'Every application in the catalog is a module you can switch on without a migration, because they share one data model.',
+    alt: 'Imbirt operations console showing installed applications across tenants',
+    turnsOn: ['All 35 applications across 9 areas', 'Human Resources', 'Payroll', 'eLearning', 'Website'],
+    modules: apps.sellableByPolicy,
+    href: '/work/imbirt#scope',
+  },
+];
+---
+
+<div class="explorer" data-explorer>
+  <div
+    class="flex flex-wrap gap-px bg-rule"
+    role="tablist"
+    aria-label="Find the part of the business you run"
+    data-explorer-tabs
+  >
+    {paths.map((p, i) => (
+      <button
+        type="button"
+        role="tab"
+        id={`tab-${p.id}`}
+        aria-controls={`panel-${p.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        tabindex={i === 0 ? '0' : '-1'}
+        class="explorer-tab label flex-1 bg-paper px-4 py-4 text-left text-ink-500 no-underline transition-colors duration-200 hover:text-ink-900"
+        data-explorer-tab
+      >
+        <span class="block text-brass-600 tnum">{String(i + 1).padStart(2, '0')}</span>
+        <span class="mt-1.5 block font-body text-sm font-medium normal-case tracking-normal text-ink-900">
+          {p.tab}
+        </span>
+      </button>
+    ))}
+  </div>
+
+  <div class="mt-px bg-rule">
+    {paths.map((p, i) => (
+      <div
+        role="tabpanel"
+        id={`panel-${p.id}`}
+        aria-labelledby={`tab-${p.id}`}
+        class="explorer-panel grid gap-10 bg-paper p-6 sm:p-10 lg:grid-cols-[1.15fr_0.85fr]"
+        data-explorer-panel
+        data-active={i === 0 ? 'true' : 'false'}
+        hidden={i === 0 ? undefined : true}
+      >
+        <div>
+          <p class="label text-brass-600">{p.kicker}</p>
+          <h3 class="mt-3 max-w-xl text-[clamp(1.5rem,3vw,2.125rem)] leading-[1.08]">
+            {p.title}
+          </h3>
+          <p class="mt-5 max-w-prose text-ink-700">{p.proof}</p>
+
+          <div class="dim-rule mt-8" aria-hidden="true"></div>
+
+          <div class="mt-6 grid gap-8 sm:grid-cols-2">
+            <div>
+              <p class="label text-ink-500">Switched on for you</p>
+              <ul class="mt-3 space-y-2">
+                {p.turnsOn.map((t) => (
+                  <li class="flex gap-2.5 text-sm text-ink-700">
+                    <span class="mt-2 h-1 w-1 shrink-0 bg-brass-600" aria-hidden="true"></span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p class="label text-ink-500">In the package</p>
+              <p class="mt-3 font-display text-4xl tnum">{p.modules}</p>
+              <p class="mt-1 text-sm text-ink-500">
+                {p.modules === 1 ? 'application' : 'applications or modules'}
+              </p>
+              <a
+                href={p.href}
+                class="label mt-6 inline-flex items-center gap-2 border border-rule-strong px-4 py-3 text-ink-900 no-underline transition-colors hover:border-ledger-700 hover:bg-paper-raised"
+              >
+                See it in the case study
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:sticky lg:top-24 lg:self-start">
+          <Shot
+            file={p.shot}
+            plate={p.plate}
+            caption={p.caption}
+            alt={p.alt}
+            measure="1600 × 1000"
+          />
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* The active tab is a filled, committed region — the same deep ledger green
+     the site reserves for "this is decided". It is the only place a tab uses a
+     fill, so the eye knows where it is without a second look. */
+  .explorer-tab[aria-selected='true'] {
+    background: var(--ledger-900);
+    color: var(--bone);
+  }
+  .explorer-tab[aria-selected='true'] .text-brass-600,
+  .explorer-tab[aria-selected='true'] span.text-ink-900 {
+    color: var(--brass-400);
+  }
+
+  /* Panels cross-fade. Only transform and opacity, and the incoming panel is
+     the only one painted — two half-opacity panels stacked is the thing this
+     avoids. */
+  .explorer-panel[data-active='true'] {
+    animation: panel-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .explorer-panel[data-active='true'] {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Tablist behaviour. Written by hand rather than pulled from a component
+   * library because the whole thing is eleven lines of state, and a dependency
+   * would cost more than the feature.
+   *
+   * Runs on `astro:page-load`, which fires on first paint and again after every
+   * ClientRouter swap, so the explorer works on every navigation. The guard on
+   * the root element is what stops a double bind.
+   */
+  const KEY = 'hg-explorer-bound';
+  const w = window as unknown as { [KEY]?: symbol };
+
+  function init(root: HTMLElement) {
+    if (w[KEY] === root) return;
+    w[KEY] = root;
+
+    const tabs = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('[data-explorer-tab]'),
+    );
+    const panels = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-explorer-panel]'),
+    );
+    if (tabs.length !== panels.length) return;
+
+    const select = (next: number) => {
+      tabs.forEach((tab, i) => {
+        const on = i === next;
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+        tab.tabIndex = on ? 0 : -1;
+        const panel = panels[i];
+        if (!panel) return;
+        if (on) {
+          panel.hidden = false;
+          // Re-trigger the cross-fade on every switch, not just the first.
+          panel.removeAttribute('data-active');
+          void panel.offsetWidth;
+          panel.setAttribute('data-active', 'true');
+        } else {
+          panel.hidden = true;
+          panel.removeAttribute('data-active');
+        }
+      });
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        const keys: Record<string, number> = {
+          ArrowRight: i + 1,
+          ArrowLeft: i - 1,
+          Home: 0,
+          End: tabs.length - 1,
+        };
+        const dest = keys[e.key];
+        if (dest === undefined) return;
+        e.preventDefault();
+        const clamped = (dest + tabs.length) % tabs.length;
+        tabs[clamped]?.focus();
+        select(clamped);
+      });
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-explorer]').forEach(init);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+  document.addEventListener('astro:page-load', boot);
+</script>

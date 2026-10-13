@@ -4,8 +4,11 @@
 */
 
 /*
-  Global security headers. A portfolio has no user input and no cookies,
-  so a strict CSP is cheap and it is a real quality signal on the page.
+  Global security headers. A portfolio has no user input and no cookies, so a
+  strict CSP is cheap and it is a real quality signal on the page. Every script
+  on this site is external — see public/theme-init.js for why the theme bootstrap
+  is a file rather than inline — so script-src 'self' can be stated without the
+  'unsafe-inline' escape hatch that would make the header meaningless.
 */
 /*
   X-Content-Type-Options: nosniff

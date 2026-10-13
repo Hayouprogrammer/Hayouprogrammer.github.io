@@ -1,0 +1,144 @@
+---
+/**
+ * ContentsBar — the ten sections of the case study, always reachable.
+ *
+ * The case study is long and it is the page a serious buyer actually reads.
+ * Without a contents bar the only way to find "the AI part" is to scroll and
+ * hope, which is the same problem the work page had. This makes the structure
+ * legible at a glance and turns every section into one click.
+ *
+ * Sticky directly beneath the masthead, so it is always the second thing on
+ * screen and never the first. On a phone it becomes a single scrollable row
+ * rather than a wrapped block — ten buttons stacked would push the whole page
+ * down.
+ *
+ * The active section is tracked with an IntersectionObserver. This is one of
+ * the few places JavaScript is genuinely required: CSS scroll timelines can
+ * animate an element you can *see* moving, but they cannot know which of ten
+ * distant sections the reader is currently inside and light up a link in
+ * another element. Everything else on this site is CSS for exactly that reason.
+ */
+interface Item {
+  serial: string;
+  label: string;
+  href: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav
+  class="no-print sticky top-14 z-30 border-b border-rule bg-paper/92 backdrop-blur-sm"
+  aria-label="Case study sections"
+  data-contents
+>
+  <div class="dossier mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <ol class="-mx-1 flex items-center gap-0.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {items.map((item) => (
+        <li class="shrink-0">
+          <a
+            href={item.href}
+            class="label flex items-baseline gap-1.5 px-2.5 py-1.5 no-underline transition-colors"
+            data-contents-link
+            aria-current="false"
+          >
+            <span class="text-brass-600 tnum">{item.serial}</span>
+            <span class="text-ink-500">{item.label}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</nav>
+
+<style>
+  /* The active section is the only filled link in the bar, and it uses the same
+     deep ledger green as the header's contact button — so "where you are" and
+     "where to go" read as the same kind of thing. */
+  [data-contents-link][aria-current='true'] {
+    background: var(--ledger-900);
+    color: var(--bone);
+  }
+  [data-contents-link][aria-current='true'] .text-brass-600 {
+    color: var(--brass-400);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-contents-link] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Active-section tracking.
+   *
+   * Uses a rootMargin band across the middle of the viewport rather than the
+   * default "anything intersecting": with ten sections of very different
+   * heights, the default fires for two or three at once and the bar flickers
+   * between them. Watching the middle band means exactly one section is ever
+   * current — the one the reader is looking at.
+   *
+   * Falls back to the first link when nothing is current, which is also the
+   * correct state at the very top of the page before anything has scrolled.
+   */
+  const KEY = 'hg-contents-bound';
+  const w = window as unknown as { [KEY]?: symbol };
+
+  function init(nav: HTMLElement) {
+    if (w[KEY] === nav) return;
+    w[KEY] = nav;
+
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('[data-contents-link]'));
+    const targets = links
+      .map((l) => document.querySelector<HTMLElement>(l.hash))
+      .filter((t): t is HTMLElement => t !== null);
+    if (!targets.length) return;
+
+    const set = (el: HTMLElement | null) => {
+      links.forEach((l) => {
+        const on = el !== null && document.querySelector(l.hash) === el;
+        l.setAttribute('aria-current', on ? 'true' : 'false');
+      });
+    };
+
+    if (typeof IntersectionObserver !== 'function') {
+      // No observer: the bar still works as a set of jump links, which is what
+      // matters. It simply does not highlight where you are.
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        // Pick the entry nearest the top of the band, so scrolling back up
+        // hands control to the section you are leaving rather than the next one.
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length) set(visible[0].target as HTMLElement);
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    );
+
+    targets.forEach((t) => io.observe(t));
+
+    // Leaving the page or a swapped body must not leave a stale observer.
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-contents]').forEach(init);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+  document.addEventListener('astro:page-load', boot);
+</script>

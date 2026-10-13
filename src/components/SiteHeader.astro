@@ -1,4 +1,17 @@
 ---
+/**
+ * The masthead.
+ *
+ * The nav exists to serve the four questions a buyer arrives with: what is this,
+ * is it for me, can I trust you, how do I reach you. So the links are ordered by
+ * that, the contact action is the only filled element on the page — the one
+ * thing we want clicked is the one thing that looks clickable — and the
+ * *primary* label and the *destination* never disagree.
+ *
+ * The plate serial stays because it is part of the document's identity, but it
+ * is set back to the same weight as the rest of the marginalia rather than
+ * competing with the nav.
+ */
 interface Props {
   plate?: string;
 }
@@ -9,17 +22,20 @@ import ThemeToggle from './ThemeToggle.astro';
 
 const nav = [
   { href: '/work', label: 'Work' },
+  { href: '/work/imbirt', label: 'Case study', short: 'Case study' },
   { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/cv', label: 'CV' },
 ];
 
-const isActive = (href: string) => Astro.url.pathname.startsWith(href);
+const isActive = (href: string) =>
+  href === '/' ? Astro.url.pathname === '/' : Astro.url.pathname.startsWith(href);
 ---
 
 <header class="no-print sticky top-0 z-40 border-b border-rule bg-paper/92 backdrop-blur-sm">
   <div class="dossier mx-auto w-full max-w-6xl px-4 sm:px-6">
-
-    <!-- Phone: two rows so the name never truncates and the nav never crowds it. -->
+    <!-- Phone: the name on one row, a compact nav and the one action that
+         matters on the next. The name never truncates and the nav never
+         crowds it. -->
     <div class="flex h-auto flex-col gap-2 py-2.5 sm:hidden">
       <div class="flex items-center justify-between gap-3">
         <a href="/" class="flex items-baseline gap-2.5 no-underline">
@@ -29,18 +45,24 @@ const isActive = (href: string) => Astro.url.pathname.startsWith(href);
         </a>
         <ThemeToggle />
       </div>
-      <nav aria-label="Sections" class="flex items-center">
+      <nav aria-label="Sections" class="flex items-center gap-3">
         {nav.map((item) => (
           <a
             href={item.href}
             class:list={[
-              'label px-2.5 py-1 no-underline transition-colors first:pl-0',
+              'label no-underline transition-colors',
               isActive(item.href) ? 'text-ink-900' : 'text-ink-500 hover:text-ink-900',
             ]}
           >
-            {item.label}
+            {item.short ?? item.label}
           </a>
         ))}
+        <a
+          href="/contact"
+          class="label ml-auto bg-ledger-900 px-3 py-1.5 text-bone no-underline transition-colors hover:bg-ledger-700"
+        >
+          Contact
+        </a>
       </nav>
     </div>
 
@@ -54,8 +76,9 @@ const isActive = (href: string) => Astro.url.pathname.startsWith(href);
         <span class="label hidden text-ink-500 lg:inline">ERP&nbsp;&amp;&nbsp;Platform&nbsp;Engineering</span>
       </a>
 
-      <div class="flex items-center gap-2">
-        {plate && <span class="label hidden text-brass-600 md:inline tnum">{plate}</span>}
+      <div class="flex items-center gap-1">
+        {plate && <span class="label hidden text-brass-600 lg:inline tnum">{plate}</span>}
+        <span class="mx-1.5 hidden h-4 w-px bg-rule lg:inline" aria-hidden="true"></span>
         <nav aria-label="Sections" class="flex items-center">
           {nav.map((item) => (
             <a
@@ -69,15 +92,29 @@ const isActive = (href: string) => Astro.url.pathname.startsWith(href);
             </a>
           ))}
         </nav>
+        <span class="mx-1.5 h-4 w-px bg-rule" aria-hidden="true"></span>
+        <!-- The only filled control in the masthead. It is the conversion, so
+             it is allowed to be the loudest thing here and nothing else is. -->
+        <a
+          href="/contact"
+          class="label inline-flex items-center gap-2 bg-ledger-900 px-4 py-2 text-bone no-underline transition-colors hover:bg-ledger-700"
+        >
+          Contact
+          <span aria-hidden="true">→</span>
+        </a>
         <span class="mx-1 h-4 w-px bg-rule" aria-hidden="true"></span>
         <ThemeToggle />
       </div>
     </div>
-
   </div>
 </header>
 
 <script>
+  /**
+   * Theme label sync. Re-runs on `astro:page-load` because ClientRouter swaps
+   * the body on navigation — a module script only executes once, so without
+   * this the labels would be stale after the first page change.
+   */
   const root = document.documentElement;
 
   const sync = () => {
@@ -93,16 +130,10 @@ const isActive = (href: string) => Astro.url.pathname.startsWith(href);
       .forEach((el) => el.setAttribute('aria-pressed', String(dark)));
   };
 
-  sync();
-  document.querySelectorAll('#theme-toggle').forEach((button) => {
-    button.addEventListener('click', () => {
-      const dark = root.classList.toggle('dark');
-      try {
-        localStorage.setItem('hg-theme', dark ? 'dark' : 'light');
-      } catch (e) {
-        /* private browsing: the toggle still works, it just will not persist */
-      }
-      sync();
-    });
-  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', sync, { once: true });
+  } else {
+    sync();
+  }
+  document.addEventListener('astro:page-load', sync);
 </script>

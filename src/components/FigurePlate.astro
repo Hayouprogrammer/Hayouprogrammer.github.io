@@ -8,6 +8,12 @@ interface Props {
   /** Plate number, e.g. "FIG. 4.2" */
   plate: string;
   caption: string;
+  /**
+   * What this capture proves, revealed on hover or focus. The caption says what
+   * the screen is; this says why it is on the page. A client scanning a dense
+   * Odoo screenshot should not have to work out which half of it matters.
+   */
+  proof?: string;
   /** Optional measurement note in the plate's lower-right corner. */
   measure?: string;
   alt: string;
@@ -16,7 +22,7 @@ interface Props {
   priority?: boolean;
 }
 
-const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false } = Astro.props;
+const { src, plate, caption, proof, measure, alt, aspect = '16 / 10', priority = false } = Astro.props;
 ---
 
 <figure class="group plate" data-plate>
@@ -44,6 +50,14 @@ const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false 
       />
     </picture>
 
+    <!-- The loupe. A brass rule draws across the top edge as the plate is
+         engaged, then the spotlight opens around the cursor. Both are
+         pseudo-elements on the trigger, so the whole frame stays one click
+         target and nothing intercepts the pointer. -->
+    <span class="plate-rule" aria-hidden="true"></span>
+    <span class="plate-ring" aria-hidden="true"></span>
+    <span class="plate-lamp" aria-hidden="true"></span>
+
     <!-- Affordance. Present in the DOM, revealed on hover/focus so it is
          discoverable without becoming a permanent overlay on every plate. -->
     <span
@@ -61,85 +75,156 @@ const { src, plate, caption, measure, alt, aspect = '16 / 10', priority = false 
     </span>
     {measure && <span class="label hidden shrink-0 text-ink-300 tnum sm:inline">{measure}</span>}
   </figcaption>
+
+  {proof && (
+    <p
+      class="plate-proof mt-1.5 max-w-prose text-sm text-ink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+    >
+      <span class="label mr-2 text-brass-600">Proves</span>{proof}
+    </p>
+  )}
 </figure>
 
 <style>
-  /* ---- the plate comes toward you -------------------------------------
-     A perspective on the frame plus translateZ on the image is what makes the
-     plate read as an object lifting off the page rather than a picture growing
-     inside a box. The tilt follows the pointer so the lift has a direction,
-     and the shadow opens up underneath at the same time. Everything is driven
-     by two custom properties the script sets once per pointer move. */
+  /* ---- the loupe --------------------------------------------------------
+     Hovering a plate should feel like leaning over a document to read one
+     part of it, not like a card doing a trick.
+
+     Three things happen at once, and each is doing a job:
+       · the plate lifts a hair and its shadow opens, so it comes forward off
+         the page;
+       · a brass rule draws across the top edge, so the engagement is legible
+         even if you miss the spotlight;
+       · the spotlight dims everything outside a circle under the cursor and
+         puts a brass ring on that circle, so the cursor is telling you which
+         part of a dense Odoo screen to read.
+
+     The spotlight is a radial gradient punched through a dim field, positioned
+     by two custom properties the script writes once per pointer move. It is
+     the reason this beat a 3D tilt: on a screenshot full of table rows, the
+     tilt moved the whole picture and told you nothing, whereas this makes one
+     region readable and says *look here*. */
   .plate-trigger {
     position: relative;
-    perspective: 1400px;
-    perspective-origin: var(--px, 50%) var(--py, 50%);
-  }
-
-  .plate-trigger > picture {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  .plate-img {
-    transform-origin: var(--px, 50%) var(--py, 50%);
-    transform:
-      rotateX(var(--rx, 0deg))
-      rotateY(var(--ry, 0deg))
-      translateZ(var(--tz, 0px))
-      scale(var(--sc, 1));
+    isolation: isolate;
     transition:
-      transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
-      filter 420ms cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform;
-    backface-visibility: hidden;
+      transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* The lift. Small on purpose: the plate must stay a document, not a toy. */
-  .plate-trigger:hover .plate-img,
-  .plate-trigger:focus-visible .plate-img {
-    --tz: 44px;
-    --sc: 1.035;
-    filter: saturate(1.06) contrast(1.02);
-  }
-
-  /* Depth: the shadow opens up as the plate rises, and the frame's edge
-     tightens so the object reads as closer. */
-  .plate-trigger {
-    transition: box-shadow 420ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
   .plate-trigger:hover,
   .plate-trigger:focus-visible {
+    transform: translate3d(0, -3px, 0);
     box-shadow:
-      0 2px 0 rgba(21, 24, 26, 0.06),
-      0 26px 48px -22px rgba(13, 51, 45, 0.5),
-      0 44px 80px -40px rgba(13, 51, 45, 0.4);
+      0 1px 0 rgba(21, 24, 26, 0.06),
+      0 18px 36px -22px rgba(13, 51, 45, 0.5),
+      0 30px 60px -34px rgba(13, 51, 45, 0.42);
   }
 
   .dark .plate-trigger:hover,
   .dark .plate-trigger:focus-visible {
     box-shadow:
-      0 2px 0 rgba(0, 0, 0, 0.4),
-      0 26px 48px -22px rgba(0, 0, 0, 0.8),
-      0 44px 80px -40px rgba(0, 0, 0, 0.9);
+      0 1px 0 rgba(0, 0, 0, 0.5),
+      0 20px 40px -22px rgba(0, 0, 0, 0.85),
+      0 34px 70px -36px rgba(0, 0, 0, 0.9);
   }
 
-  /* A plate that is being dragged inside the viewer is not a hover target. */
+  .plate-img {
+    transition: filter 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Inside the spotlight the capture sharpens slightly — a touch more contrast
+     and saturation. The dim outside does the work; this makes the inside read
+     as the thing being examined. */
+  .plate-trigger:hover .plate-img,
+  .plate-trigger:focus-visible .plate-img {
+    filter: saturate(1.08) contrast(1.05);
+  }
+
+  /* The engagement rule. Grows from the left, the direction you read in. */
+  .plate-rule {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: var(--brass-600);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .plate-trigger:hover .plate-rule,
+  .plate-trigger:focus-visible .plate-rule {
+    transform: scaleX(1);
+  }
+
+  /* The dim field with a hole in it. `--mx/--my` default to the centre, so
+     before the first pointer move the spotlight is simply centred. */
+  .plate-lamp {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(
+      circle 9rem at var(--mx, 50%) var(--my, 50%),
+      transparent 0%,
+      transparent 52%,
+      var(--veil) 100%
+    );
+  }
+  .plate-trigger:hover .plate-lamp,
+  .plate-trigger:focus-visible .plate-lamp {
+    opacity: 1;
+  }
+
+  /* The brass ring on the cursor. Sits inside the dim field so it reads as the
+     rim of the loupe rather than a separate widget. */
+  .plate-ring {
+    position: absolute;
+    top: var(--my, 50%);
+    left: var(--mx, 50%);
+    width: 18rem;
+    height: 18rem;
+    margin: -9rem 0 0 -9rem;
+    border-radius: 50%;
+    border: 1px solid var(--ring-brass);
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .plate-trigger:hover .plate-ring,
+  .plate-trigger:focus-visible .plate-ring {
+    opacity: 1;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .plate-img {
-      transition: none;
-      transform: none;
-    }
-    .plate-trigger:hover .plate-img,
-    .plate-trigger:focus-visible .plate-img {
-      /* No motion, but still the emphasis: a flat, honest brightening. */
-      filter: saturate(1.08) contrast(1.04);
-    }
     .plate-trigger,
+    .plate-img,
+    .plate-rule,
+    .plate-lamp,
+    .plate-ring {
+      transition: none;
+    }
     .plate-trigger:hover,
     .plate-trigger:focus-visible {
-      transition: none;
+      transform: none;
+    }
+    /* No spotlight: a screen reader user or a reduced-motion user gets the
+       flat, honest capture and the proof line, which is the content anyway. */
+    .plate-trigger:hover .plate-lamp,
+    .plate-trigger:focus-visible .plate-lamp,
+    .plate-trigger:hover .plate-ring,
+    .plate-trigger:focus-visible .plate-ring {
+      opacity: 0;
+    }
+    .plate-trigger:hover .plate-rule,
+    .plate-trigger:focus-visible .plate-rule {
+      transform: scaleX(1);
     }
   }
 </style>

@@ -20,7 +20,8 @@ npm run gate     # build + QR decode + contrast + accessibility, one command
 | File | What it is |
 |---|---|
 | [`SPEC.md`](SPEC.md) | What this site is for, the stack, the route map, the quality gates |
-| [`DEPLOY.md`](DEPLOY.md) | Where it is hosted now, why not Vercel, and the domain migration path |
+| [`DEPLOY.md`](DEPLOY.md) | Why a VPS with Caddy, and the deploy runbook |
+| [`deploy/README.md`](deploy/README.md) | The VPS runbook: Caddyfile, compose, first deploy, backups |
 | [`BROCHURE.md`](BROCHURE.md) | The printed-leaflet strategy, the QR specification, and the copy |
 | [`public/qr/README.md`](public/qr/README.md) | Print-ready QR codes and the exact spec for the print shop |
 | [`DESIGN.md`](DESIGN.md) | The visual system — tokens, type, motion, components, and why |
@@ -40,6 +41,10 @@ npm run gate     # build + QR decode + contrast + accessibility, one command
 | `npm run audit` | Accessibility, overflow, console and request gate — light, dark, mobile |
 | `npm run viewer` | Behavioural test of the plate viewer in a real browser |
 | `npm run contrast` | WCAG contrast check on every token pair |
+| `npm run verify-features` | The motion and navigation actually fire — scroll timelines, loupe, tabs, contents bar |
+| `npm run verify-dark` | Captures Sheet and Binding side by side in `output/verify/` |
+| `npm run verify-headers` | Loads the site under the production CSP and proves nothing breaks |
+| `npm run verify-live` | Drives the deployed origin in a real browser |
 | `npm run gate` | Build + QR decode + contrast + audit, in one command |
 
 ## Derived data

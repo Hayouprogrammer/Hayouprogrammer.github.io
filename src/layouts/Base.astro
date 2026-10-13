@@ -24,10 +24,9 @@ const {
   noindex = false,
 } = Astro.props;
 
-const canonical = new URL(
-  Astro.url.pathname,
-  Astro.site ?? 'https://hayelom.pages.dev',
-).href;
+// `site` is always set by astro.config.mjs (SITE_URL, defaulting to the live
+// origin), so the fallback is unreachable — it exists only to satisfy the type.
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://hayouprogrammer.github.io').href;
 ---
 
 <!doctype html>
@@ -56,24 +55,42 @@ const canonical = new URL(
          rule that breaks the page is worse than no rule. See DEPLOY.md. -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <!-- Theme resolution before first paint: no flash of the wrong sheet. -->
-    <script is:inline>
-      (function () {
-        try {
-          var stored = localStorage.getItem('hg-theme');
-          var dark = stored
-            ? stored === 'dark'
-            : window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (dark) document.documentElement.classList.add('dark');
-        } catch (e) {}
-      })();
-    </script>
+    <!-- Theme resolution before first paint: no flash of the wrong sheet.
+         Render-blocking and *external* rather than inline, so a strict
+         script-src 'self' CSP in public/_headers can be enforced without an
+         'unsafe-inline' escape hatch. `is:inline` here tells Astro to leave the
+         tag exactly as written instead of bundling the referenced file. -->
+    <script src="/theme-init.js" is:inline></script>
   </head>
 
   <body class="min-h-screen">
-    {!bare && <SiteHeader plate={plate} />}
-    <slot />
-    {!bare && <SiteFooter />}
+    <!-- One tab stop, before anything else, and it actually moves focus. -->
+    <a
+      href="#main"
+      class="label sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-ledger-900 focus:px-4 focus:py-3 focus:text-bone focus:no-underline"
+      >Skip to content</a
+    >
+
+    <!-- The sheet. Everything the reader sees is written on it, which is what
+         makes the light and dark schemes two materials rather than two colour
+         inversions — see `.sheet` in global.css. -->
+    <div class="sheet">
+      {!bare && <SiteHeader plate={plate} />}
+      <main id="main">
+        <slot />
+      </main>
+      {!bare && <SiteFooter />}
+    </div>
+
+    <!-- Reading position, as a dimension line down the margin. Decorative: the
+         document is navigable without it, and it is hidden from assistive tech
+         so it is never announced as a stray control. -->
+    {!bare && (
+      <div class="reading-rail" aria-hidden="true">
+        <i></i>
+      </div>
+    )}
+
     <PlateLightbox />
     <ClientRouter />
   </body>

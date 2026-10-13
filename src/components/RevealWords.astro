@@ -1,0 +1,67 @@
+---
+/**
+ * RevealWords — a statement that resolves word by word as it crosses the
+ * reading band.
+ *
+ * Why this exists: the first reveal on this site was attached to whole
+ * <section> elements, which are taller than the viewport, so the animation
+ * spanned about a thousand pixels of scroll and nobody ever saw it happen.
+ * Text is also the wrong thing to move — when words slide, you lose your place
+ * and re-read. So instead of moving them, this only changes their *weight*:
+ * each word starts dim and settles to full ink, in sequence. The line stays
+ * exactly where it is, so you can follow it with your eye while it resolves.
+ *
+ * Pure CSS, driven by the native scroll timeline. No JavaScript, no
+ * IntersectionObserver, no layout work. With no `animation-timeline` support
+ * the words are simply there at full weight, which is the correct outcome.
+ *
+ * The stagger is authored per word with an inline `animation-range` rather than
+ * an `animation-delay`: on a progress timeline a delay is a *scroll distance*,
+ * not a time, so a delay-based stagger produces a jumble instead of a sweep.
+ */
+
+interface Props {
+  /** The statement. Split on spaces; each word gets its own range. */
+  text: string;
+  /** Element to render. Defaults to a paragraph. */
+  tag?: 'p' | 'h2' | 'h3' | 'span';
+  /** Extra classes on the element. */
+  class?: string;
+  /**
+   * Scroll span: how far into the element's own `entry` range the first word
+   * starts resolving, and how far in the last word begins. Percentages.
+   */
+  span?: [number, number];
+}
+
+const {
+  text,
+  tag = 'p',
+  class: className = '',
+  span: [from = 0, to = 42] = [0, 42],
+} = Astro.props;
+
+// A capitalised local holding a lowercase tag name is how Astro renders a
+// dynamic element.
+const Tag = tag;
+
+const words = text.split(/\s+/).filter(Boolean);
+const n = words.length;
+// The first word begins at `from`, the last at `to`. Every word then takes the
+// same distance to finish, so the sweep is even whatever the line length.
+const spread = n > 1 ? to / (n - 1) : 0;
+---
+
+<Tag class={`word-lit ${className}`}>
+  {words.map((w, i) => (
+    <span
+      style={`animation-range: entry ${(from + i * spread).toFixed(2)}% entry ${(
+        from +
+        i * spread +
+        30
+      ).toFixed(2)}%`}
+    >
+      {w}&nbsp;
+    </span>
+  ))}
+</Tag>

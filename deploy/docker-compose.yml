@@ -1,0 +1,54 @@
+# The portfolio, in production.
+#
+# One service and one bind mount. There is no application server, no database,
+# no build step on the box — the build happens where this file is run from, and
+# the box only ever serves a finished directory. That is the whole reason a
+# static site is the right shape for this: the production surface has nothing in
+# it that can be exploited, patched or woken at 3am.
+#
+#   cd deploy && docker compose up -d
+#
+services:
+  web:
+    image: caddy:2-alpine
+    container_name: portfolio-web
+    restart: unless-stopped
+
+    ports:
+      # Plain HTTP only. Caddy answers the ACME challenge on 80 and redirects to
+      # HTTPS itself, so there is nothing to gain — and one thing to lose — by
+      # publishing 443 as well. If the VPS is behind a firewall that blocks
+      # inbound 443 from the container, nothing works.
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # The build output. Read-only: the container has no reason to write here,
+      # and a read-only mount turns a compromised container into a read-only one.
+      - ../dist:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+    environment:
+      # The domain, and the address the certificate authority warns at. Set both
+      # in .env beside this file before the first `docker compose up`.
+      SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@localhost}
+
+    # Caddy needs to write its own certificate state and to bind 80/443; nothing
+    # else. Dropping the default capabilities is free.
+    security_opt:
+      - no-new-privileges:true
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Caddy keeps its certificates and account key here. These are the only state on
+# the box that matters, so they get their own named volume and get backed up.
+volumes:
+  caddy_data:
+  caddy_config:

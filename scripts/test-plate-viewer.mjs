@@ -12,10 +12,7 @@ import { existsSync } from 'node:fs';
 
 const BASE = process.env.AUDIT_BASE ?? 'http://127.0.0.1:4321';
 
-const exe = [
-  process.env.PLAYWRIGHT_CHROMIUM,
-  'C:/Users/hayel/AppData/Local/ms-playwright/chromium-1247/chrome-win64/chrome.exe',
-].find((p) => p && existsSync(p));
+import { launchOptions } from './browser.mjs';
 
 const results = [];
 const check = (name, ok, detail = '') => {
@@ -23,7 +20,7 @@ const check = (name, ok, detail = '') => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
 };
 
-const browser = await chromium.launch({ executablePath: exe });
+const browser = await chromium.launch(launchOptions());
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
 const pageErrors = [];
 page.on('pageerror', (e) => pageErrors.push(e.message));
@@ -103,7 +100,7 @@ check('clicking again returns to fit', back === '100%', `${back}`);
 await page.keyboard.press('Escape');
 check('closed after zoom toggle', !(await dialog.evaluate((d) => d.open)));
 
-// ---- hover: the plate comes toward the viewer ----
+// ---- hover: the loupe ----
 // Its own context with motion allowed: the page above emulates
 // prefers-reduced-motion, and that path is asserted separately at the end.
 const motion = await browser.newContext({
@@ -116,40 +113,81 @@ const target = mpage.locator('[data-plate-trigger]').nth(2);
 await target.scrollIntoViewIfNeeded();
 await mpage.mouse.move(2, 2);
 await target.hover();
-await mpage.waitForTimeout(600);
+await mpage.waitForTimeout(700);
 
-const hoverState = await target.locator('img').evaluate((el) => {
-  const cs = getComputedStyle(el);
-  const frame = getComputedStyle(el.parentElement.parentElement);
+// The spotlight, the ring and the rule are all driven by two custom properties
+// the trigger writes on pointermove. What is asserted here is the *effect*, not
+// the implementation: that a dim field opens, that it is centred on the cursor,
+// that the engagement rule draws, and that the capture sharpens inside the
+// spotlight. Those are the four things a reader actually sees.
+const loupe = await target.evaluate((el) => {
+  const lamp = el.querySelector('.plate-lamp');
+  const ring = el.querySelector('.plate-ring');
+  const rule = el.querySelector('.plate-rule');
+  const img = el.querySelector('img');
   return {
-    transform: cs.transform,
-    tz: cs.getPropertyValue('--tz').trim(),
-    sc: cs.getPropertyValue('--sc').trim(),
-    perspective: frame.perspective,
+    mx: el.style.getPropertyValue('--mx').trim(),
+    my: el.style.getPropertyValue('--my').trim(),
+    lampOpacity: lamp ? getComputedStyle(lamp).opacity : '',
+    lampBg: lamp ? getComputedStyle(lamp).backgroundImage.slice(0, 24) : '',
+    ringOpacity: ring ? getComputedStyle(ring).opacity : '',
+    ringTop: ring ? getComputedStyle(ring).top : '',
+    ruleTransform: rule ? getComputedStyle(rule).transform : '',
+    imgFilter: img ? getComputedStyle(img).filter : '',
+    lift: getComputedStyle(el).transform,
   };
 });
-check('hover applies a 3D perspective', hoverState.perspective === '1400px', hoverState.perspective);
-check('hover lifts the plate toward the viewer', hoverState.tz === '44px', `translateZ ${hoverState.tz}`);
-check('hover scales the plate', hoverState.sc === '1.035', `scale ${hoverState.sc}`);
-check('hover produces a 3D matrix', hoverState.transform.startsWith('matrix3d'), hoverState.transform.slice(0, 40));
+check('hover opens the spotlight', loupe.lampOpacity === '1', loupe.lampOpacity);
+check('spotlight is a radial hole in a dim field', loupe.lampBg.includes('radial-gradient'), loupe.lampBg);
+check('the brass ring appears with it', loupe.ringOpacity === '1', loupe.ringOpacity);
+// `hover()` parks the pointer at the element's centre, so the spotlight should
+// be centred too. Parsed, not string-matched: the script writes the exact
+// sub-pixel ratio, and `50.0000%` is not a value it can produce.
+check(
+  'the spotlight follows the cursor',
+  Math.abs(parseFloat(loupe.mx) - 50) < 6 && Math.abs(parseFloat(loupe.my) - 50) < 6,
+  `${loupe.mx}, ${loupe.my}`,
+);
+// The ring is positioned by the same two properties, so its centre must land on
+// the cursor. Compared in pixels against the trigger's own box, because a
+// computed `top` is always a resolved length and never the percentage set.
+const ringCentre = await target.evaluate((el) => {
+  const ring = el.querySelector('.plate-ring').getBoundingClientRect();
+  const t = el.getBoundingClientRect();
+  return { cx: ((ring.left + ring.right) / 2 - t.left) / t.width * 100,
+           cy: ((ring.top + ring.bottom) / 2 - t.top) / t.height * 100 };
+});
+check(
+  'the ring sits on the cursor',
+  Math.abs(ringCentre.cx - 50) < 6 && Math.abs(ringCentre.cy - 50) < 6,
+  `cx ${ringCentre.cx.toFixed(1)}% cy ${ringCentre.cy.toFixed(1)}%`,
+);
+check('the engagement rule draws across', loupe.ruleTransform.startsWith('matrix'), loupe.ruleTransform);
+check('the capture sharpens inside the spotlight', loupe.imgFilter.includes('saturate'), loupe.imgFilter);
+check('the plate lifts off the page', loupe.lift.startsWith('matrix') && loupe.lift !== 'none', loupe.lift.slice(0, 30));
 
-// Off-centre pointer tilts; a centred one does not.
-await target.hover({ position: { x: 8, y: 8 } });
-await mpage.waitForTimeout(500);
-const tilted = await target.locator('img').evaluate((el) => ({
-  rx: parseFloat(getComputedStyle(el).getPropertyValue('--rx')),
-  ry: parseFloat(getComputedStyle(el).getPropertyValue('--ry')),
+// Off-centre, the spotlight moves with the pointer rather than staying put.
+const box = await target.boundingBox();
+await mpage.mouse.move(box.x + box.width * 0.22, box.y + box.height * 0.7);
+await mpage.waitForTimeout(400);
+const off = await target.evaluate((el) => ({
+  mx: parseFloat(el.style.getPropertyValue('--mx')),
+  my: parseFloat(el.style.getPropertyValue('--my')),
 }));
-check('off-centre pointer tilts the plate', Math.abs(tilted.ry) > 3, `ry ${tilted.ry.toFixed(2)}deg rx ${tilted.rx.toFixed(2)}deg`);
+check(
+  'an off-centre pointer moves the spotlight',
+  off.mx > 15 && off.mx < 32 && off.my > 60 && off.my < 80,
+  `mx ${off.mx.toFixed(1)}% my ${off.my.toFixed(1)}%`,
+);
 
 // Leaving resets it.
 await mpage.mouse.move(2, 2);
 await mpage.waitForTimeout(500);
-const relaxed = await target.locator('img').evaluate((el) => ({
-  tz: getComputedStyle(el).getPropertyValue('--tz').trim(),
-  ry: getComputedStyle(el).getPropertyValue('--ry').trim(),
+const relaxed = await target.evaluate((el) => ({
+  mx: el.style.getPropertyValue('--mx').trim(),
+  lamp: getComputedStyle(el.querySelector('.plate-lamp')).opacity,
 }));
-check('pointer leaving resets the plate', relaxed.tz === '' && relaxed.ry === '', JSON.stringify(relaxed));
+check('pointer leaving closes the spotlight', relaxed.mx === '' && relaxed.lamp === '0', JSON.stringify(relaxed));
 await motion.close();
 
 // ---- reduced motion suppresses the effect entirely ----
@@ -163,8 +201,16 @@ const ctarget = cpage.locator('[data-plate-trigger]').first();
 await ctarget.scrollIntoViewIfNeeded();
 await ctarget.hover();
 await cpage.waitForTimeout(400);
-const calmTransform = await ctarget.locator('img').evaluate((el) => getComputedStyle(el).transform);
-check('reduced motion suppresses the 3D lift', calmTransform === 'none', calmTransform.slice(0, 30));
+const calmLamp = await ctarget.evaluate((el) => ({
+  lamp: getComputedStyle(el.querySelector('.plate-lamp')).opacity,
+  ring: getComputedStyle(el.querySelector('.plate-ring')).opacity,
+  lift: getComputedStyle(el).transform,
+}));
+check(
+  'reduced motion suppresses the spotlight and the lift',
+  calmLamp.lamp === '0' && calmLamp.ring === '0' && calmLamp.lift === 'none',
+  JSON.stringify(calmLamp),
+);
 await calm.close();
 
 // ---- the plates on the home page too ----

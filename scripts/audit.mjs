@@ -27,16 +27,7 @@ const ROUTES = [
   { path: '/cv', name: 'cv' },
 ];
 
-// The machine carries a Playwright Chromium build that predates this package's
-// pinned revision, so resolve a real executable instead of downloading one.
-function resolveChromium() {
-  const candidates = [
-    process.env.PLAYWRIGHT_CHROMIUM,
-    'C:/Users/hayel/AppData/Local/ms-playwright/chromium-1247/chrome-win64/chrome.exe',
-    'C:/Users/hayel/AppData/Local/ms-playwright/chromium_headless_shell-1247/chrome-headless-shell-win64/chrome-headless-shell.exe',
-  ];
-  return candidates.find((p) => p && existsSync(p));
-}
+import { resolveChromium } from './browser.mjs';
 
 mkdirSync(REVIEW, { recursive: true });
 

@@ -19,12 +19,9 @@ const ADMIN = process.env.ADMIN_PASSWORD ?? process.env.ADMIN_PW ?? 'Portfolio20
 
 mkdirSync(OUT, { recursive: true });
 
-const exe = [
-  process.env.PLAYWRIGHT_CHROMIUM,
-  'C:/Users/hayel/AppData/Local/ms-playwright/chromium-1247/chrome-win64/chrome.exe',
-].find((p) => p && existsSync(p));
+import { launchOptions } from './browser.mjs';
 
-const browser = await chromium.launch({ executablePath: exe });
+const browser = await chromium.launch(launchOptions());
 const page = await browser.newPage({
   viewport: { width: 1600, height: 1000 },
   deviceScaleFactor: 2,

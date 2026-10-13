@@ -6,3 +6,13 @@ public/screens/.chatter-*.json
 public/screens/.provisioned-*.png
 *.log
 .DS_Store
+
+# Verification artefacts: screenshots and reports written by the scripts in
+# scripts/. They are evidence, not source — regenerate with `npm run verify-*`.
+output/
+
+# Deployment configuration. It holds the domain and the CA contact address, which
+# are per-machine values that change between the VPS and local testing, and
+# writing over one deployment's domain from another is a deploy into the wrong
+# place. `deploy/.env.example` is the committed template.
+deploy/.env

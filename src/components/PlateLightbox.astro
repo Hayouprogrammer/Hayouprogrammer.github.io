@@ -238,23 +238,19 @@ function init() {
   plates.forEach((p) => {
     const trigger = p.trigger;
 
-    // Tilt and lift: the rotation is derived from where the pointer sits inside
-    // the frame, so the plate leans toward the cursor as it comes forward.
+    // The loupe spotlight. Writes the cursor position as two percentages, and
+    // nothing else — the ring, the dim field and the image's transform-origin
+    // all read the same pair. One write per move, and it only happens while the
+    // pointer is actually over the plate, so an idle page does no work at all.
     trigger.addEventListener('pointermove', (e) => {
       const r = trigger.getBoundingClientRect();
-      const nx = (e.clientX - r.left) / r.width;
-      const ny = (e.clientY - r.top) / r.height;
-      trigger.style.setProperty('--px', `${nx * 100}%`);
-      trigger.style.setProperty('--py', `${ny * 100}%`);
-      trigger.style.setProperty('--ry', `${(nx - 0.5) * 9}deg`);
-      trigger.style.setProperty('--rx', `${(0.5 - ny) * 7}deg`);
+      trigger.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+      trigger.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
     });
 
     const relax = () => {
-      trigger.style.removeProperty('--px');
-      trigger.style.removeProperty('--py');
-      trigger.style.removeProperty('--rx');
-      trigger.style.removeProperty('--ry');
+      trigger.style.removeProperty('--mx');
+      trigger.style.removeProperty('--my');
     };
     trigger.addEventListener('pointerleave', relax);
     trigger.addEventListener('blur', relax);
